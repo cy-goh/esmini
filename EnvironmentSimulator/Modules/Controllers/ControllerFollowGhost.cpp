@@ -16,6 +16,8 @@
  * The purpose is purely to demonstrate how to implement a controller.
  */
 
+/* Test for git commit*/
+
 //#include "playerbase.hpp"
 #include "ControllerFollowGhost.hpp"
 #include "CommonMini.hpp"
