@@ -22,6 +22,8 @@
 
 namespace scenarioengine
 {
+	class ScenarioEngine;
+
 	// base class for controllers
 	class ControllerInteractive: public Controller
 	{
@@ -33,6 +35,7 @@ namespace scenarioengine
 		void Step(double timeStep);
 		void Activate(int domainMask);
 		void ReportKeyEvent(int key, bool down);
+		void SetScenarioEngine(ScenarioEngine* scenarioEngine) { scenarioEngine_ = scenarioEngine; };
 
 		static const char* GetTypeNameStatic() { return CONTROLLER_INTERACTIVE_TYPE_NAME; }
 		virtual const char* GetTypeName() { return GetTypeNameStatic(); }
@@ -46,7 +49,7 @@ namespace scenarioengine
 #ifdef _SCENARIO_VIEWER
 		viewer::CarModel* gfx_model;
 #endif
-
+		ScenarioEngine* scenarioEngine_;
 	};
 
 	Controller* InstantiateControllerInteractive(void* args);

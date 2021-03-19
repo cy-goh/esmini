@@ -14,6 +14,7 @@
 #include "CommonMini.hpp"
 #include "ControllerFollowGhost.hpp"
 #include "ControllerExternal.hpp"
+#include "ControllerInteractive.hpp"
 
 #define WHEEL_RADIUS 0.35
 #define STAND_STILL_THRESHOLD 1e-3  // meter per second
@@ -517,6 +518,10 @@ void ScenarioEngine::parseScenario()
 		for (size_t i = 0; i < scenarioReader->controller_.size(); i++)
 		{
 			scenarioReader->controller_[i]->Init();
+			if (scenarioReader->controller_[i]->GetType() == Controller::Type::CONTROLLER_TYPE_INTERACTIVE)
+			{
+				((ControllerInteractive*)(scenarioReader->controller_[i]))->SetScenarioEngine(this);
+			}
 		}
 
 		// find out maximum headstart time for ghosts

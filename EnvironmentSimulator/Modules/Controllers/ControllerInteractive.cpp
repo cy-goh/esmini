@@ -20,7 +20,7 @@
 #include "CommonMini.hpp"
 #include "Entities.hpp"
 #include "ScenarioGateway.hpp"
-
+#include "ScenarioEngine.hpp"
 #include <random>
 
 using namespace scenarioengine;
@@ -46,6 +46,8 @@ void ControllerInteractive::Init()
 void ControllerInteractive::Step(double timeStep)
 {
 	double speed_limit = object_->pos_.GetSpeedLimit(); 
+
+	printf("Simulation time: %.2f\n", scenarioEngine_->getSimulationTime());
 
 	if (speed_limit < SMALL_NUMBER)
 	{
