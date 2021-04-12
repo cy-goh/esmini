@@ -146,22 +146,17 @@ bool SwarmTrafficAction::detectPoints() {
 void SwarmTrafficAction::despawn() {
 	auto idPtr = vehiclesId_.begin();
 	bool increase = true;
+	roadmanager::Position cPos = centralObject_->pos_;
 	while (idPtr < vehiclesId_.end()) {
 		Object *vehicle = entities_->GetObjectById(*idPtr);
-        if (vehicle->pos_.GetH() == centralObject_->pos_.GetH()) {
-			if (vehicle->pos_.GetS() >= ellipse_.upper.pos.GetS()) { 
-			    entities_->removeObject(vehicle->name_);
-				delete vehicle;
-				idPtr = vehiclesId_.erase(idPtr);
-				increase = false;
-			}
-		} else {
-			if (vehicle->pos_.GetS() <= ellipse_.lower.pos.GetS()) {
-			    entities_->removeObject(vehicle->name_);
-				delete vehicle;
-				idPtr = vehiclesId_.erase(idPtr);
-				increase = false;
-			}
+		roadmanager::Position vPos = vehicle->pos_;
+		auto e = ellipse(cPos.GetX(), cPos.GetY(), cPos.GetH(), semiMajorAxis_, semiMinorAxis_, vPos.GetX(), vPos.GetY());
+		if (e > 0.001)
+		{
+            entities_->removeObject(vehicle->name_);
+			delete vehicle;
+			idPtr = vehiclesId_.erase(idPtr);
+			increase = false;
 		}
 
 		if (increase) ++idPtr;
