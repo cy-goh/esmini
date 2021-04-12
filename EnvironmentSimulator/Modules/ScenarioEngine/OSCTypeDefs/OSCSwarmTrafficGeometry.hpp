@@ -155,6 +155,28 @@ namespace STGeometry {
         return solsN;
     }
 
+    static void checkRange(aabbTree::Triangle &triangle, Solutions &sols) {
+        double xmin, ymin, xmax, ymax;
+        xmin = triangle.a.x; 
+        ymin = triangle.a.y;
+        xmax = triangle.b.x;
+        ymax = triangle.b.y; 
+
+        if (xmin > xmax) std::swap(xmin, xmax);
+        if (ymin > ymax) std::swap(ymin, ymax); 
+
+        auto solsIter = sols.begin();
+        while (solsIter < sols.end()) {
+            double x, y;
+            x = solsIter->x;
+            y = solsIter->y;
+            if (!(xmin <= x && x <= xmax && ymin <= y && y <= ymax))
+                solsIter = sols.erase(solsIter);
+            else 
+                solsIter++;
+        }   
+    }
+
     /* 
      * Finds the intersection points between an ellipses and a stright piece of the road
      * The equation to find the x points of intersection is assumed to be in the form
@@ -163,8 +185,8 @@ namespace STGeometry {
      *   y = m*x + q
      * 
      * The ellipse is considered to have the form:
-     *   [(x - h)cos(A) + (y - k)sin(A)]²     [(x  -h)sin(A) - (y - k)cos(A)]²
-     *  ---------------------------------- + ----------------------------------
+     *   [(x - h)cos(A) + (y - k)sin(A)]²     [(x  - h)sin(A) - (y - k)cos(A)]²
+     *  ---------------------------------- + ---------------------------------- = 1
      *                  a²                                   b²
      * Where:
      *   * x, y: coordinates of a point of the ellipse
