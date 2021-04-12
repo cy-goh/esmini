@@ -11,15 +11,40 @@
  */
 
 #pragma once
-#include<cmath>
+#include <cmath>
 #include "RoadManager.hpp"
+#include "OSCAABBTree.hpp"
+#include <functional>
+#include <vector>
 
 namespace STGeometry {
 
 #define M(hdg) tan(hdg)
 #define Q(x0, y0, hdg0) ((y0) - M(hdg) * (x0))
-#define ZERO_T 0 // SMALL_NUMBER
 
+    typedef struct {
+        double SMjA;
+        double SMnA;
+        roadmanager::Position egoPos;
+    } EllipseInfo;
+
+    typedef std::function<double(double)> DDProc;
+    typedef std::vector<aabbTree::Point> Solutions;
+
+    double inline ellipse(
+        double h,
+        double k,
+        double A,
+        double SMjA,
+        double SMnA,
+        double x,
+        double y
+    ) {
+        double e1, e2;
+        e1 = ((x - h) * cos(A) + (y - k) * sin(A)) / SMjA;
+        e2 = ((x - h) * sin(A) - (y - k) * cos(A)) / SMnA;
+        return pow(e1, 2) + pow(e2, 2) - 1;
+    }
 
     /*
      * Line considered in the form y = mx + q
