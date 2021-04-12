@@ -248,4 +248,76 @@ namespace STGeometry {
             return 0;
         }
     }
+
+    bool brent_zeros(int a, int b, double &res, double delta, DDProc f) {
+        double fa, fb, fc, fs, c, d, s;
+        bool flag;
+        fa = f(a);
+        fb = f(b);
+        if (fa * fb >= 0) return false;
+        if (abs(fa) < abs(fb)) std::swap(fa, fb);
+        c = a;
+        fc = f(c);
+        flag = true;
+        while (true) {
+            if (fa  != fc && fb != fc) 
+                s = (a * fb * fc) / ((fa - fb) * (fa - fc)) +
+                    (b * fa * fc) / ((fb - fa) * (fb - fc)) +
+                    (c * fa * fb) / ((fc - fa) * (fc - fb));
+            else
+                s = b - fb * (b - a) / (fb - fa);
+
+            if (((3 * a + b) / 4 <= s && s <= b) ||
+                (flag && abs(s - b) >= abs(b - c) / 2) ||
+                (!flag && abs(s - b) >= abs(c - d) / 2) ||
+                (flag && abs(b - c) < abs(delta)) ||
+                (!flag && abs(c - d) < abs(delta)))
+            {
+                s = (a + b) / 2;
+                flag = true;
+            } else 
+                flag = false;
+            fs = f(s);
+            d = c;
+            c = b;
+            if (fa * fs < 0)
+                b = s;
+            else
+                a = s;
+            if (abs(f(a)) < abs(f(b))) std::swap(a, b);
+            
+            if (f(s) == 0 || abs(b - a) <= SMALL_NUMBER) {
+                res = s;
+                return true;
+            };
+            fa = f(a);
+            fb = f(b);
+            fc = f(c);
+        }
+        return false;
+    }
+
+    // Any check to see if the spiral is a line or a curve must be performed outside this routine
+    bool clothoidIntersect(aabbTree::Triangle &triangle, EllipseInfo eInfo, Solutions &sol) {
+        double res;
+        double h, k, A, SMjA, SMnA;
+        roadmanager::Spiral *spiral = static_cast<roadmanager::Spiral*>(triangle.geometry());
+        h = eInfo.egoPos.GetX();
+        k = eInfo.egoPos.GetY();
+        A = eInfo.egoPos.GetH();
+        SMjA = eInfo.SMjA;
+        SMnA = eInfo.SMnA;
+
+        DDProc ellipseP = [h, k, A, SMjA, SMnA, spiral](double s) {
+            double x, y, hdg, e;
+            spiral->EvaluateDS(s, &x, &y, &hdg);
+            return ellipse(h, k, A, SMjA, SMnA, x, y);
+        };
+        if (!brent_zeros(triangle.a.x, triangle.b.x, res, SMALL_NUMBER, ellipseP)) return false;
+        double x, y, hdg;
+        spiral->EvaluateDS(res, &x, &y, &hdg);
+        sol.push_back(aabbTree::Point(x,y));
+        checkRange(triangle, sol);
+        return !sol.empty();
+    }
 }
