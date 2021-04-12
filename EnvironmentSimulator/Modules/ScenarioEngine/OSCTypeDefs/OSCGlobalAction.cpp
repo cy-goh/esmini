@@ -12,6 +12,8 @@
 
 #include "OSCGlobalAction.hpp"
 #include "OSCSwarmTrafficGeometry.hpp"
+#include "OSCAABBTree.hpp"
+#include <memory>
 
 using namespace scenarioengine;
 using namespace STGeometry;
@@ -34,6 +36,14 @@ void SwarmTrafficAction::Start()
 	printf("IR: %f, SMjA: %f, SMnA: %f\n", innerRadius_, semiMajorAxis_, semiMinorAxis_);
 
 	odrManager_ = roadmanager::Position::GetOpenDrive();
+    aabbTree::Tree tree;// = std::make_shared<aabbTree::Tree>();
+	aabbTree::BBoxVec vec;
+	auto triangle = std::make_shared<aabbTree::Triangle>();
+	auto bbox = std::make_shared<aabbTree::BBox>(triangle);
+	vec.clear();
+	vec.push_back(bbox);
+	tree.build(vec);
+	printf("Number of nodes: %lu\n", tree.nodeCount());
 	OSCAction::Start();
 }
 
