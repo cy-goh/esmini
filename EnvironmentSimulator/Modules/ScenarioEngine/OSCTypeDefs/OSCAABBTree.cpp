@@ -57,12 +57,11 @@ BBox::BBox(ptTriangle triangle) : triangle_(triangle) {
 
 BBox::BBox(BBoxVec const &bboxes) {
     merge(bboxes.begin(), bboxes.end());
-    triangle_ = nullptr;
 }
 
-BBox::BBox(BBoxVec::iterator const start, BBoxVec::iterator const end) {
-    merge(start, end);
+BBox::BBox(BBoxVec::const_iterator start, BBoxVec::const_iterator end) {
     triangle_ = nullptr;
+    merge(start, end);
 }
 
 inline bool BBox::collide(ptBBox const bbox) const {

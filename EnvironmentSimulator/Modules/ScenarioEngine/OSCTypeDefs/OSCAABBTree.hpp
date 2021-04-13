@@ -57,7 +57,7 @@ namespace aabbTree {
     public:
         BBox(ptTriangle triangle);
         BBox(BBoxVec const &bboxes);
-        BBox(BBoxVec::iterator const start, BBoxVec::iterator const end);
+        BBox(BBoxVec::const_iterator start, BBoxVec::const_iterator end);
         ~BBox(){}
         Point blhCorner() const { return blhc_;     }
         Point urhCorner() const { return urhc_;     }
