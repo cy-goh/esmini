@@ -165,7 +165,7 @@ void Tree::__build(BBoxVec::iterator const start, BBoxVec::iterator const end) {
                 currentTree_ = record.tree;
             } else break;
         } else {
-            ptBBox tmpBbox = make_shared<BBox>(first, last);
+            ptBBox  tmpBbox = make_shared<aabbTree::BBox>(first, last);
             currentTree().bbox = tmpBbox;
             cut = divide(first, last, tmpBbox);
             ptTree pos = make_shared<Tree>();
