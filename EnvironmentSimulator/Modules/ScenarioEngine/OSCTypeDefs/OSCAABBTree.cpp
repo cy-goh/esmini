@@ -237,7 +237,39 @@ BBoxVec::iterator Tree::divide(BBoxVec::iterator const start, BBoxVec::iterator 
     }
 }
 
-void Tree::intersect(Tree const &tree, ) const {
-    
+/*
+ * It Intersects two trees and pots the possible candidate  bounding boxes
+ * a vector 
+ */
+void Tree::intersect(Tree const &tree, vector<Candidate> &candidates) const {
+    candidates.clear();
+    if (!bbox && !tree.BBox() && !tree.BBox()->collide(bbox)) return;
+
+    char case_ = (childeren.empty() ? 0 : 1) + (tree.Children().empty() ? 0 : 2);
+    switch(case_) {
+        case 0: { // Leaf & Leaf
+            candidates.push_back(Candidate(bbox, tree.BBox()));
+            break;
+        }
+        case 1: { // Tree & Leaf
+            for (ptTree const child : childeren) {
+                child->intersect(tree, candidates);
+            }
+            break;
+        }
+        case 2: { // Leaf & Tree
+            for (ptTree const child : tree.Children()) {
+                intersect(*child, candidates);
+            }
+            break;
+        }
+        case 3: { // Tree & Tree
+            for (ptTree const child1 : childeren) {
+                for (ptTree const child2 : tree.Children())
+                    child1->intersect(*child2, candidates);
+            }
+            break;
+        }
+    } 
 }
 
