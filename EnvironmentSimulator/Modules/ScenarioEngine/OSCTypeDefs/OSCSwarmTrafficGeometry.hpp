@@ -249,6 +249,11 @@ namespace STGeometry {
         }
     }
 
+    /*
+     * Finds the zeros of a function 'f' given te guess 
+     * interval (a, b) and a tollerance 'delta'. The result
+     * is saved in 'res' and the function returns true if a solution is found 
+     */
     bool brent_zeros(int a, int b, double &res, double delta, DDProc f) {
         double fa, fb, fc, fs, c, d, s;
         bool flag;
@@ -313,11 +318,12 @@ namespace STGeometry {
             spiral->EvaluateDS(s, &x, &y, &hdg);
             return ellipse(h, k, A, SMjA, SMnA, x, y);
         };
-        if (!brent_zeros(triangle.a.x, triangle.b.x, res, SMALL_NUMBER, ellipseP)) return false;
+        if (!brent_zeros(triangle.sI, triangle.sF, res, SMALL_NUMBER, ellipseP)) return false;
         double x, y, hdg;
         spiral->EvaluateDS(res, &x, &y, &hdg);
-        sol.push_back(aabbTree::Point(x,y));
-        checkRange(triangle, sol);
+        sol.push_back(Point(x,y));
+        checkRange(triangle, sol); // Maybe useless call
         return !sol.empty();
     }
+
 }
