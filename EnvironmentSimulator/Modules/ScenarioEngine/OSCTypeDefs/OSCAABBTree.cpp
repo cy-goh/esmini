@@ -76,7 +76,7 @@ bool BBox::collide(BBox const &bbox) const {
         blhc_.x > urhc.x ||
         urhc_.y < blhc.y ||
         blhc_.y > urhc.y
-    )
+    );
 }
 
 double inline BBox::midPointX() const {
