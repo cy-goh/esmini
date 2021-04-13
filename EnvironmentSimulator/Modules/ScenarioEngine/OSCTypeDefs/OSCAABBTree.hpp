@@ -74,12 +74,21 @@ namespace aabbTree {
         void merge(BBoxVec::const_iterator start, BBoxVec::const_iterator end);
     };
 
+    struct CandidateStruct;
+    typedef struct CandidateStruct {
+        ptBBox bbox1;
+        ptBBox bbox2;
+        CandidateStruct(ptBBox bbx1, ptBBox bbx2) : bbox1(bbx1), bbox2(bbx2) {}
+    } Candidate;
+
     class Tree {
     public:
-        Tree(){ nodeCount_ = 0; }
+        Tree() : bbox(nullptr), nodeCount_(0) {}
         ~Tree();
-        void intersect(Tree const &tree) const;
+        void intersect(Tree const &tree, vector<Candidate> &candidates) const;
         void build(BBoxVec &bboxes);
+        vector<ptTree>const &Children() const { return childeren; }
+        ptBBox BBox() const { return bbox; }
         unsigned long nodeCount() { return nodeCount_; }
     private:
         ptBBox bbox;
