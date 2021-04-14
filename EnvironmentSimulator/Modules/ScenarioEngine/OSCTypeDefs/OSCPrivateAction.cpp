@@ -14,6 +14,7 @@
 #include <math.h>
 
 #include "OSCPrivateAction.hpp"
+#include "ScenarioEngine.hpp"
 
 #define MAX(x, y) (y > x ? y : x)
 #define MIN(x, y) (y < x ? y : x)
@@ -723,6 +724,13 @@ void LongDistanceAction::ReplaceObjectRefs(Object* obj1, Object* obj2)
 void TeleportAction::Start()
 {
 	OSCAction::Start();
+	//ScenarioEngine myEngine = new ScenarioEngine();
+	LOG("Teleport time for %s :", object_->name_.c_str());
+	if (object_->IsGhost() && scenarioEngine_->getSimulationTime() > 0)
+	{
+		printf("Time: %.2f \n", scenarioEngine_->getSimulationTime());
+		scenarioEngine_->SetSimulationTime(scenarioEngine_->getSimulationTime() - scenarioEngine_->GetHeadstartTime());
+	}
 
 	if (object_->GetControllerMode() == Controller::Mode::MODE_OVERRIDE &&
 		object_->IsControllerActiveOnDomains(Controller::Domain::CTRL_LONGITUDINAL | Controller::Domain::CTRL_LONGITUDINAL))

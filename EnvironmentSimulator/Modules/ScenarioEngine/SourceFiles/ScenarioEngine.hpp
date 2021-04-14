@@ -31,6 +31,7 @@ namespace scenarioengine
 {
 	class ScenarioEngine
 	{
+		//void TimeSetBack();
 	public:
 
 		Entities entities;
@@ -46,7 +47,7 @@ namespace scenarioengine
 		void printSimulationTime();
 		void prepareOSIGroundTruth(double dt);
 		void defaultController(Object* obj, double dt);
-		void ReplaceObjectInTrigger(Trigger* trigger, Object* obj1, Object* obj2, double timeOffset);
+		void ReplaceObjectInTrigger(Trigger* trigger, Object* obj1, Object* obj2, double timeOffset, Event* event = 0);
 		void SetupGhost(Object* object);
 
 		std::string getScenarioFilename() { return scenarioReader->getScenarioFilename(); }
@@ -64,6 +65,17 @@ namespace scenarioengine
 		void SetSimulationTime(double time) { simulationTime_ = time; }
 		double* GetSimulationTimePtr() { return &simulationTime_; }
 
+		void SetFakeTime(double time) { fakeTime_ = time; }
+		double GetFakeTime() { return fakeTime_; }
+		double* GetFakeTimePtr() { return &fakeTime_;  }
+
+		//static void TimeSetBack();
+
+		double simulationTime_;
+		double headstart_time_;
+		double fakeTime_;
+		bool doOnce = true;
+
 	private:
 		// OpenSCENARIO parameters
 		Catalogs catalogs;
@@ -74,8 +86,7 @@ namespace scenarioengine
 		bool disable_controllers_;
 
 		// Simulation parameters
-		double simulationTime_;
-		double headstart_time_;
+		
 		Vehicle sumotemplate;
 		ScenarioGateway scenarioGateway;
 
