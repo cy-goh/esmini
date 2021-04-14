@@ -11,6 +11,7 @@
  */
 
 #include "OSCAABBTree.hpp"
+#include "OSCTriangle2D.hpp"
 #include <cmath>
 #include <vector>
 #include <memory>
@@ -20,6 +21,7 @@ using namespace aabbTree;
 using std::min;
 using std::max;
 using std::make_shared;
+using triangle2D::overlap2d;
 
 /******************************************
  *  _____     _                   _       *
@@ -31,7 +33,8 @@ using std::make_shared;
  *****************************************/
 
 bool Triangle::collide(ptTriangle const triangle) const {
-
+    Triangle const &tr = *triangle;
+    return overlap2d(a, b, c, tr.a, tr.b, tr.c);
 }
 
 
