@@ -301,6 +301,18 @@ bool Trigger::Evaluate(StoryBoard *storyBoard, double sim_time)
 					for (size_t k = 0; k < trigger->triggered_by_entities_.size(); k++)
 					{
 						LOG("Triggering entity %d: %s", k, trigger->triggered_by_entities_[k]->name_.c_str());
+
+						std::string car = "Ego_ghost";
+						if (car == trigger->triggered_by_entities_[k]->name_.c_str()) {
+							LOG("Now Ego_ghost is here!");
+							LOG("Number %d", k);
+						}
+						else {
+							LOG("This is not the Ghost!");
+							LOG("Number %d", k);
+							LOG("%s pos: ", trigger->triggered_by_entities_[k]->name_.c_str());
+							trigger->triggered_by_entities_[k]->pos_.Print();
+						}
 					}
 				}
 			}

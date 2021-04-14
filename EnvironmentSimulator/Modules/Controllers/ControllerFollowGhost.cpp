@@ -35,6 +35,7 @@ Controller* scenarioengine::InstantiateControllerFollowGhost(void* args)
 
 ControllerFollowGhost::ControllerFollowGhost(InitArgs* args) : Controller(args)
 {
+
 	if (args->properties->ValueExists("headstartTime"))
 	{
 		headstart_time_ = strtod(args->properties->GetValueStr("headstartTime"));
@@ -51,17 +52,20 @@ ControllerFollowGhost::ControllerFollowGhost(InitArgs* args) : Controller(args)
 void ControllerFollowGhost::Init()
 {
 	object_->SetHeadstartTime(headstart_time_);
+
 	
 	Controller::Init();
 }
 
 void ControllerFollowGhost::Step(double timeStep)
 {
+
 	if (!object_->GetGhost())
 	{
 		// No ghost associated
 		return;
 	}
+
 
 	// Set steering target point at a distance ahead proportional to the speed
 	double probe_target_distance = MAX(7, 0.5 * object_->speed_);
