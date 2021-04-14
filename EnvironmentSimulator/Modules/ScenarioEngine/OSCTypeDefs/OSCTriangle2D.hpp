@@ -48,7 +48,7 @@ namespace triangle2D {
 
     static inline double 
     orientation(Point const a, Point const b, Point const c) {
-        return ((a.x - c.x) * (b.y - c.y)) - ((a.y - c.y) * (b.x - c.y));
+        return ((a.x - c.x) * (b.y - c.y)) - ((a.y - c.y) * (b.x - c.x));
     }
 
     static inline bool
