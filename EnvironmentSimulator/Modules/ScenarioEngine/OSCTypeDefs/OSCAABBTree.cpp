@@ -242,7 +242,9 @@ BBoxVec::iterator Tree::divide(BBoxVec::iterator const start, BBoxVec::iterator 
 
 /*
  * It Intersects two trees and pots the possible candidate  bounding boxes
- * a vector 
+ * a vector. This function has been adapted from:
+ *   https://github.com/ebertolazzi/Clothoids/blob/master/src/AABBtree.cc
+ * 
  */
 void Tree::intersect(Tree const &tree, vector<Candidate> &candidates) const {
     candidates.clear();
