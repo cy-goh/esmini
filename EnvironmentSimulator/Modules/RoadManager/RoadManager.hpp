@@ -793,12 +793,14 @@ namespace roadmanager
 	public:
 		virtual void GetPos(double& x, double& y, double& z) = 0;
 		virtual double GetHeight() = 0;
+		virtual ~OutlineCorner() {}
 	};
 
 	class OutlineCornerRoad : public OutlineCorner
 	{
 	public:
 		OutlineCornerRoad(int roadId, double s, double t, double dz, double height);
+		~OutlineCornerRoad() {}
 		void GetPos(double& x, double& y, double& z);
 		double GetHeight() { return height_; }
 
@@ -811,6 +813,7 @@ namespace roadmanager
 	{
 	public:
 		OutlineCornerLocal(int roadId, double s, double t, double u, double v, double zLocal, double height, double heading);
+		~OutlineCornerLocal() {}
 		void GetPos(double& x, double& y, double& z);
 		double GetHeight() { return height_; }
 

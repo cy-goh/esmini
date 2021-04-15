@@ -556,6 +556,7 @@ void ScenarioEngine::parseScenario()
 						SetHeadstartTime(obj->ghost_->GetHeadstartTime());
 						SetSimulationTime(-obj->ghost_->GetHeadstartTime());
 						SetFakeTime(0);
+
 					}
 				}
 			}
@@ -819,7 +820,7 @@ void ScenarioEngine::SetupGhost(Object* object)
 	ghost->SetHeadstartTime(object->headstart_time_);
 	entities.addObject(ghost);
 	object->SetHeadstartTime(0);
-	
+
 	int numberOfInitActions = (int)init.private_action_.size();
 	for (int i = 0; i < numberOfInitActions; i++)
 	{

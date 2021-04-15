@@ -135,7 +135,7 @@ TEST_P(PolynomialTestEvaluateArgumentParametrized, TestEvaluateArgumentConstruct
     ASSERT_EQ(polynomial_argument.Evaluate(std::get<0>(tuple)), std::get<1>(tuple));
 }
 
-INSTANTIATE_TEST_CASE_P(TestEvaluateParamArgument, PolynomialTestEvaluateArgumentParametrized, testing::Values(
+INSTANTIATE_TEST_SUITE_P(TestEvaluateParamArgument, PolynomialTestEvaluateArgumentParametrized, testing::Values(
                                                 std::make_tuple(2,-215),
                                                 std::make_tuple(0, 1)));
 
