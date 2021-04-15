@@ -74,16 +74,6 @@ namespace scenarioengine
 		double fakeTime_;
 		bool doOnce = true;
 
-		void SetFakeTime(double time) { fakeTime_ = time; }
-		double GetFakeTime() { return fakeTime_; }
-		double* GetFakeTimePtr() { return &fakeTime_;  }
-
-		//static void TimeSetBack();
-
-		double simulationTime_;
-		double headstart_time_;
-		double fakeTime_;
-		bool doOnce = true;
 
 	private:
 		// OpenSCENARIO parameters
