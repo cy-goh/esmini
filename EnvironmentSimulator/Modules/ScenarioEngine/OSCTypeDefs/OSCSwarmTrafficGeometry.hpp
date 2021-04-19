@@ -155,7 +155,7 @@ namespace STGeometry {
         return solsN;
     }
 
-    static void checkRange(aabbTree::Triangle &triangle, Solutions &sols) {
+    static void checkRange(aabbTree::Triangle &triangle, Solutions &sols, size_t pos) {
         double xmin, ymin, xmax, ymax;
         xmin = triangle.a.x; 
         ymin = triangle.a.y;
@@ -165,7 +165,7 @@ namespace STGeometry {
         if (xmin > xmax) std::swap(xmin, xmax);
         if (ymin > ymax) std::swap(ymin, ymax); 
 
-        auto solsIter = sols.begin();
+        Solutions::const_iterator solsIter = sols.begin() + pos;
         while (solsIter < sols.end()) {
             double x, y;
             x = solsIter->x;
