@@ -286,10 +286,10 @@ namespace STGeometry {
                 s = b - fb * (b - a) / (fb - fa);
 
             if (((3 * a + b) / 4 <= s && s <= b) ||
-                (flag && abs(s - b) >= abs(b - c) / 2) ||
-                (!flag && abs(s - b) >= abs(c - d) / 2) ||
-                (flag && abs(b - c) < abs(delta)) ||
-                (!flag && abs(c - d) < abs(delta)))
+                (flag && fabs(s - b) >= fabs(b - c) / 2) ||
+                (!flag && fabs(s - b) >= fabs(c - d) / 2) ||
+                (flag && fabs(b - c) < abs(delta)) ||
+                (!flag && fabs(c - d) < fabs(delta)))
             {
                 s = (a + b) / 2;
                 flag = true;
