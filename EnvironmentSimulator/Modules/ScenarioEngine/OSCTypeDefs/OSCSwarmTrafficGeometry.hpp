@@ -22,6 +22,9 @@ namespace STGeometry {
 #define M(hdg) tan(hdg)
 #define Q(x0, y0, hdg0) ((y0) - M(hdg) * (x0))
 
+    using aabbTree::Triangle;
+    using aabbTree::Point;
+
     typedef struct {
         double SMjA;
         double SMnA;
@@ -194,15 +197,22 @@ namespace STGeometry {
      *   * A: orientation angle
      *   * a, b: semi-major axes and semi-minor axes    
      */
-    char lineIntersect(roadmanager::Position pos, roadmanager::Line *line, double SMjA, double SMnA, double* x1, double* y1, double* x2, double* y2) {
-        double _A, _B, _C, delta, x0, y0, hdg, sqrt_delta, m, q, h, k;
-        *x1 = *x2 = *y1 = *y2 = 0;
+    static bool lineIntersect(Triangle &triangle, EllipseInfo const &eInfo, Solutions &sol) {
+        double _A, _B, _C, delta, x0, y0, hdg, sqrt_delta, m, q, h, k, SMjA, SMnA;
+        roadmanager::Line *line = static_cast<roadmanager::Line*>(triangle.geometry());
+        roadmanager::Position pos = eInfo.egoPos;
+        Point p1, p2;
+        auto last = sol.size();
+
+        p1.x = p1.y = p2.x = p2.y;
         
-        x0  = line->GetX();
-        y0  = line->GetY();
-        hdg = line->GetHdg();
-        h   = pos.GetX();
-        k   = pos.GetY();
+        SMjA = eInfo.SMjA;
+        SMnA = eInfo.SMnA;
+        x0   = line->GetX();
+        y0   = line->GetY();
+        hdg  = line->GetHdg();
+        h    = pos.GetX();
+        k    = pos.GetY();
 
         if (!(cos(hdg) <= SMALL_NUMBER)) {
             m   = M(hdg);
@@ -223,44 +233,47 @@ namespace STGeometry {
         if(delta > 0) {
             sqrt_delta = sqrt(delta);
             if (!(cos(hdg) <= SMALL_NUMBER)) {
-                *x1 = (-_B - sqrt_delta) / (2 * _A);
-                *x2 = (-_B + sqrt_delta) / (2 * _A);
-                *y1 = m * (*x1) + q;
-                *y2 = m * (*x2) + q;
+                p1.x = (-_B - sqrt_delta) / (2 * _A);
+                p2.x = (-_B + sqrt_delta) / (2 * _A);
+                p1.y = m * (p1.x) + q;
+                p2.y = m * (p1.x) + q;
             } else {
-                *x1 = *x2 = x0;
-                *y1 = (-_B - sqrt_delta) / (2 * _A);
-                *y2 = (-_B + sqrt_delta) / (2 * _A);
+                p1.x = p2.x = x0;
+                p1.y = (-_B - sqrt_delta) / (2 * _A);
+                p2.y = (-_B + sqrt_delta) / (2 * _A);
             }
-            return checkRange(line, 2, x1, y1, x2, y2);
+            sol.push_back(p1);
+            sol.push_back(p2);
         }
         else if (delta == 0) {
             if (!(cos(hdg) <= SMALL_NUMBER)) {
-                *x1 = -_B / (2.0 * _A);
-                *y1 = m * *x1 + q;
+                p1.x = -_B / (2.0 * _A);
+                p1.y = m * p1.x + q;
             } else {
-                *x1 = x0;
-                *y1 = -_B / (2.0 * _A);
+                p1.x = x0;
+                p1.y = -_B / (2.0 * _A);
             }
-            return checkRange(line, 1, x1, y1, x2, y2);
+            sol.push_back(p1);
         }
         else {
-            return 0;
+            return false;
         }
+        checkRange(triangle, sol, last);
+        return sol.size() > last;
     }
 
     /*
-     * Finds the zeros of a function 'f' given te guess 
+     * Finds the zeros of a function 'f' given the guess 
      * interval (a, b) and a tollerance 'delta'. The result
      * is saved in 'res' and the function returns true if a solution is found 
      */
-    bool brent_zeros(int a, int b, double &res, double delta, DDProc f) {
+    static bool brent_zeros(int a, int b, double &res, double delta, DDProc f) {
         double fa, fb, fc, fs, c, d, s;
         bool flag;
         fa = f(a);
         fb = f(b);
         if (fa * fb >= 0) return false;
-        if (abs(fa) < abs(fb)) std::swap(fa, fb);
+        if (fabs(fa) < fabs(fb)) std::swap(fa, fb);
         c = a;
         fc = f(c);
         flag = true;
