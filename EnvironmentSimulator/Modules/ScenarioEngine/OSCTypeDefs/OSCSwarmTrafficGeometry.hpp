@@ -302,9 +302,9 @@ namespace STGeometry {
                 b = s;
             else
                 a = s;
-            if (abs(f(a)) < abs(f(b))) std::swap(a, b);
+            if (fabs(f(a)) < fabs(f(b))) std::swap(a, b);
             
-            if (f(s) == 0 || abs(b - a) <= SMALL_NUMBER) {
+            if (f(s) == 0 || fabs(b - a) <= SMALL_NUMBER) {
                 res = s;
                 return true;
             };
