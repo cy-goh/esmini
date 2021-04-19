@@ -316,7 +316,7 @@ namespace STGeometry {
     }
 
     // Any check to see if the spiral is a line or a curve must be performed outside this routine
-    bool clothoidIntersect(aabbTree::Triangle &triangle, EllipseInfo eInfo, Solutions &sol) {
+    static bool clothoidIntersect(Triangle &triangle, EllipseInfo &eInfo, Solutions &sol) {
         double res;
         double h, k, A, SMjA, SMnA;
         roadmanager::Spiral *spiral = static_cast<roadmanager::Spiral*>(triangle.geometry());
