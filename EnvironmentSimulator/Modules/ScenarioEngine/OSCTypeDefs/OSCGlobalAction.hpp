@@ -96,7 +96,6 @@ namespace scenarioengine
 			double             h;
 		} pointInfo;
 
-		typedef struct pointRef;
 		struct pointRef {
 			roadmanager::Road*    road;
 			Vehicle*              last;
