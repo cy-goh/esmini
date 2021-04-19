@@ -334,8 +334,9 @@ namespace STGeometry {
         if (!brent_zeros(triangle.sI, triangle.sF, res, SMALL_NUMBER, ellipseP)) return false;
         double x, y, hdg;
         spiral->EvaluateDS(res, &x, &y, &hdg);
-        sol.push_back(Point(x,y));
-        checkRange(triangle, sol); // Maybe useless call
+        auto pos = sol.size();
+        sol.push_back(aabbTree::Point(x,y));
+        checkRange(triangle, sol, pos); // Maybe useless call
         return !sol.empty();
     }
 
