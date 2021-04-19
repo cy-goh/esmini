@@ -278,3 +278,47 @@ void Tree::intersect(Tree const &tree, vector<Candidate> &candidates) const {
     } 
 }
 
+static void processCandidates(vector<Candidate> const &candidates, vector<ptTriangle> &solutions) {
+    for (auto const candidate : candidates) {
+        ptTriangle const &tr1 = candidate.bbox1->triangle();
+        ptTriangle const &tr2 = candidate.bbox2->triangle();
+        if (tr1->collide(tr2)) {
+            if (tr2->geometry())
+                solutions.push_back(tr2);
+            else 
+                solutions.push_back(tr1);
+        }
+    } 
+}
+
+static void findPoints(vector<ptTriangle> const &triangles, EllipseInfo &eInfo, Solutions &points){
+    for (auto const tr : triangles) {
+        if (tr->geometry()) {
+            auto gm = tr->geometry();
+            switch (gm->GetType()) {
+                case gm->GEOMETRY_TYPE_UNKNOWN: {
+                    break;
+                }
+			    case gm->GEOMETRY_TYPE_LINE: {
+                    lineIntersect(*tr, eInfo, points);
+                    break;
+                }
+			    case gm->GEOMETRY_TYPE_ARC: {
+                    break;
+                }
+			    case gm->GEOMETRY_TYPE_SPIRAL: {
+                    clothoidIntersect(*tr, eInfo, points);
+                    break;
+                }
+			    case gm->GEOMETRY_TYPE_POLY3: {
+                    break;
+                }
+			    case gm->GEOMETRY_TYPE_PARAM_POLY3: {
+                    break;
+                }
+            }
+        } else 
+            LOG("Warning: triangle without a geometry found");
+    }
+}
+

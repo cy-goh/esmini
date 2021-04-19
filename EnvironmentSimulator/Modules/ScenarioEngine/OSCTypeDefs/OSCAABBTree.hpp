@@ -104,4 +104,8 @@ namespace aabbTree {
             ptTree tree;
         } StackRecord;
     };
+
+    static void processCandidates(vector<Candidate> const &candidates, vector<ptTriangle> &solutions);
+
+    static void findPoints(vector<ptTriangle> const &triangles, vector<Point> &points);
 }
