@@ -764,6 +764,9 @@ void TeleportAction::Start()
 	{
 		printf("Time: %.2f \n", scenarioEngine_->getSimulationTime());
 		scenarioEngine_->SetSimulationTime(scenarioEngine_->getSimulationTime() - scenarioEngine_->GetHeadstartTime());
+		printf("Trail: %d \n", object_->trail_.GetNumberOfVertices());
+		object_->trail_.Reset();
+		printf("Trail: %d \n", object_->trail_.GetNumberOfVertices());
 	}
 
 	if (object_->GetControllerMode() == Controller::Mode::MODE_OVERRIDE &&

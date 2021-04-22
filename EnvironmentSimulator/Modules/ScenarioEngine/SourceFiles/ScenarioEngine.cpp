@@ -298,9 +298,26 @@ void ScenarioEngine::step(double deltaSimTime)
 											{
 												if (maneuver->event_[n]->IsActive())
 												{
-													maneuver->event_[n]->End();
+													for (size_t o = 0; o < maneuver->event_[n]->action_.size(); o++)
+													{
+														OSCAction* action = maneuver->event_[n]->action_[o];
+														OSCPrivateAction* pa = (OSCPrivateAction*)action;
+														if (pa->object_->IsGhost() && pa->type_ != OSCPrivateAction::ActionType::TELEPORT)
+														{
+															maneuver->event_[n]->Reset();
+															LOG("Event %s reseted, overwritten by event %s",
+																maneuver->event_[n]->name_.c_str(), event->name_.c_str());
+														}
+														else
+														{
+															maneuver->event_[n]->End();
+															LOG("Event %s ended, overwritten by event %s",
+																maneuver->event_[n]->name_.c_str(), event->name_.c_str());
+														}
+													}
+													/*maneuver->event_[n]->End();
 													LOG("Event %s ended, overwritten by event %s",
-														maneuver->event_[n]->name_.c_str(), event->name_.c_str());
+														maneuver->event_[n]->name_.c_str(), event->name_.c_str());*/
 												}
 											}
 
@@ -369,6 +386,9 @@ void ScenarioEngine::step(double deltaSimTime)
 	{
 
 		Object* obj = entities.object_[i];
+		//printf("Name: %s  ", obj->name_.c_str());
+		//printf("Trail: %d \n", obj->trail_.GetNumberOfVertices());
+
 		// Do not move objects when speed is zero, 
 		// and only ghosts allowed to execute before time == 0
 		if (!(obj->IsControllerActiveOnDomains(Controller::Domain::CTRL_BOTH) && obj->GetControllerMode() == Controller::Mode::MODE_OVERRIDE) &&
@@ -381,6 +401,19 @@ void ScenarioEngine::step(double deltaSimTime)
 		// Report state to the gateway
 		scenarioGateway.reportObject(obj->id_, obj->name_, static_cast<int>(obj->type_), obj->category_, obj->model_id_,
 			obj->GetActivatedControllerType(), obj->boundingbox_, simulationTime_, obj->speed_, obj->wheel_angle_, obj->wheel_rot_, &obj->pos_);
+	
+		//if (obj->IsGhost())
+		//{
+		//	if (obj->trail_.GetNumberOfVertices() != 0)
+		//	{
+		//		printf("X, Y pos, time, Ghost traj: %.2f %.2f %.2f \n", obj->trail_.GetVertex(-1)->x, obj->trail_.GetVertex(-1)->y, obj->trail_.GetVertex(-1)->time);
+		//	}
+		//	else
+		//	{
+		//		printf("Empty \n");
+		//	}
+		//	
+		//}
 	}
 
 	// Apply controllers
@@ -775,6 +808,23 @@ void ScenarioEngine::ReplaceObjectInTrigger(Trigger* trigger, Object* obj1, Obje
 						{
 							trig->triggering_entities_.entity_[k].object_ = obj2;
 						}
+						// Changes added to do action when target is triggering
+						else if (trig->triggering_entities_.entity_[k].object_ != obj1)
+						{
+							TeleportAction* myNewAction = new TeleportAction;
+							roadmanager::Position* pos = new roadmanager::Position();
+							pos->SetInertiaPos(0, 0, 0);
+							pos->SetRelativePosition(&obj1->pos_, roadmanager::Position::PositionType::RELATIVE_OBJECT);
+							myNewAction->position_ = pos;
+							myNewAction->type_ = OSCPrivateAction::ActionType::TELEPORT;
+							myNewAction->object_ = obj2;
+							
+							myNewAction->scenarioEngine_ = this;
+							//myNewAction->object_ = entities.object_[1];
+							//event->action_.push_back(myNewAction);
+							event->action_.insert(event->action_.begin(), myNewAction);
+						}
+						// Stop changes
 					}
 				}
 				else {
@@ -783,11 +833,13 @@ void ScenarioEngine::ReplaceObjectInTrigger(Trigger* trigger, Object* obj1, Obje
 					pos->SetInertiaPos(0, 0, 0);
 					pos->SetRelativePosition(&obj1->pos_, roadmanager::Position::PositionType::RELATIVE_OBJECT);
 					myNewAction->position_ = pos;
+					myNewAction->type_ = OSCPrivateAction::ActionType::TELEPORT;
 					myNewAction->object_ = obj2;
 					myNewAction->scenarioEngine_ = this;
 					//myNewAction->object_ = entities.object_[1];
 
-					event->action_.push_back(myNewAction);
+					//event->action_.push_back(myNewAction);
+					event->action_.insert(event->action_.begin(), myNewAction);
 
 					//maneuver->event_.push_back(teleportEvent);
 					LOG("Created new action-------------------------------------------");
@@ -798,7 +850,7 @@ void ScenarioEngine::ReplaceObjectInTrigger(Trigger* trigger, Object* obj1, Obje
 				TrigByValue* trig = (TrigByValue*)cond;
 				if (trig->type_ == TrigByValue::Type::SIMULATION_TIME)
 				{
-					((TrigBySimulationTime*)(trig))->value_ += timeOffset;
+					((TrigBySimulationTime*)(trig))->value_; // += timeOffset;
 				}
 			}
 		}

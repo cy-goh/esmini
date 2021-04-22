@@ -7786,10 +7786,12 @@ int PolyLineBase::FindClosestPoint(double xin, double yin, TrajVertex& pos, int&
 	double distMin = LARGE_NUMBER;
 
 	// Find closest line segment
-	for (size_t i = startAtIndex; i < GetNumberOfVertices() - 1; i++)
+	for (size_t i = 0; i < GetNumberOfVertices() - 1; i++) // was set as i = startAtIndex
 	{
 		ProjectPointOnVector2D(xin, yin, vertex_[i].x, vertex_[i].y, vertex_[i+1].x, vertex_[i+1].y, tmpPos.x, tmpPos.y);
 		double distTmp = PointDistance2D(xin, yin, tmpPos.x, tmpPos.y);
+
+		//printf("Xin, Yin, ver[i]X , ver[i]Y, %.2f, %.2f, %.2f, %.2f \n", xin, yin, vertex_[i].x, vertex_[i].y);
 
 		bool inside = PointInBetweenVectorEndpoints(tmpPos.x, tmpPos.y, vertex_[i].x, vertex_[i].y, vertex_[i + 1].x, vertex_[i + 1].y, sLocal);
 		if (!inside)
@@ -7822,7 +7824,7 @@ int PolyLineBase::FindClosestPoint(double xin, double yin, TrajVertex& pos, int&
 
 	if (distMin < LARGE_NUMBER)
 	{
-		EvaluateSegmentByLocalS(iMin, sLocalMin, 0.0, pos);
+  		EvaluateSegmentByLocalS(iMin, sLocalMin, 0.0, pos);
 		index = iMin;
 		return 0;
 	}
