@@ -15,12 +15,13 @@
 #include <memory>
 #include <vector>
 
-using namespace roadmanager;
-using std::shared_ptr;
-using std::vector;
-
 namespace aabbTree {
 
+    using namespace roadmanager;
+    using std::shared_ptr;
+    using std::vector;
+
+    class Point;
     class Triangle;
     class BBox;
     class Tree;
