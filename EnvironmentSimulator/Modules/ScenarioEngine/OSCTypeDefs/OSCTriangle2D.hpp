@@ -62,8 +62,8 @@ namespace triangle2D {
         Point const c2
     ) {
         if (orientation(c2, a2, b1) >= 0) {
-            if (orientation(c2, b2, b1) >= 0) {
-                if (orientation(a1, a2, b1) >=  0) 
+            if (orientation(c2, b2, b1) <= 0) {
+                if (orientation(a1, a2, b1) >  0) 
                     return orientation(a1, b2, b1) <= 0;
                 else
                     return orientation(a1, a2, c1) >= 0 && orientation(b1, c1, a2) >= 0;
