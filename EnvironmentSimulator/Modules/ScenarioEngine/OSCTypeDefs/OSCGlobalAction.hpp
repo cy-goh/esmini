@@ -16,6 +16,7 @@
 #include "CommonMini.hpp"
 #include "Parameters.hpp"
 #include "Entities.hpp"
+#include "OSCAABBTree.hpp"
 
 namespace scenarioengine
 {
@@ -146,12 +147,14 @@ namespace scenarioengine
 
 		Entities *entities_;
 		Object* centralObject_;
+		aabbTree::ptTree rTree;
 		curveInfo circle_, ellipse_;
 		std::vector<int> vehiclesId_;
 		roadmanager::OpenDrive* odrManager_;
-		double innerRadius_, semiMajorAxis_, semiMinorAxis_;
+		double innerRadius_, semiMajorAxis_, semiMinorAxis_, minSize_;
 
-		void initRoadSegments();
+		void createRoadSegments(aabbTree::BBoxVec &vec);
+		void createEllipseSegments(aabbTree::BBoxVec &vec);
 		void spawn(pointRef &segment, int lane, double hdg_offset);
 		bool detectPoints();
 		void despawn();
