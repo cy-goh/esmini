@@ -72,22 +72,23 @@ inline bool BBox::collide(ptBBox const bbox) const {
 }
 
 bool BBox::collide(BBox const &bbox) const {
-    Point urhc = bbox.urhCorner();
-    Point blhc = bbox.blhCorner();
+    Point const &urhc = bbox.urhCorner();
+    Point const &blhc = bbox.blhCorner();
+
     return !(
-        urhc_.x < blhc.x ||
-        blhc_.x > urhc.x ||
-        urhc_.y < blhc.y ||
-        blhc_.y > urhc.y
+        (urhc_.x < blhc.x) ||
+        (blhc_.x > urhc.x) ||
+        (urhc_.y < blhc.y) ||
+        (blhc_.y > urhc.y)
     );
 }
 
 double inline BBox::midPointX() const {
-    return (urhc_.x - blhc_.x) / 2;
+    return (urhc_.x + blhc_.x) / 2;
 }
 
 double inline BBox::midPointY() const {
-    return (urhc_.y - blhc_.y) / 2;
+    return (urhc_.y + blhc_.y) / 2;
 }
 
 void BBox::merge(BBoxVec::const_iterator start, BBoxVec::const_iterator end) {
