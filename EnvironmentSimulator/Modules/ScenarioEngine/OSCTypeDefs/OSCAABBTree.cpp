@@ -12,16 +12,21 @@
 
 #include "OSCAABBTree.hpp"
 #include "OSCTriangle2D.hpp"
+#include "RoadManager.hpp"
+#include "OSCSwarmTrafficGeometry.hpp"
 #include <cmath>
 #include <vector>
 #include <memory>
 #include <functional>
+#include <iostream>
 
 using namespace aabbTree;
 using std::min;
 using std::max;
 using std::make_shared;
 using triangle2D::overlap2d;
+using roadmanager::Geometry;
+using namespace STGeometry;
 
 /******************************************
  *  _____     _                   _       *
@@ -277,7 +282,7 @@ void Tree::intersect(Tree const &tree, Candidates &candidates) const {
     } 
 }
 
-static void processCandidates(vector<Candidate> const &candidates, vector<ptTriangle> &solutions) {
+void aabbTree::processCandidates(Candidates const &candidates, vector<ptTriangle> &solutions) {
     for (auto const candidate : candidates) {
         ptTriangle const &tr1 = candidate.bbox1->triangle();
         ptTriangle const &tr2 = candidate.bbox2->triangle();
@@ -290,7 +295,7 @@ static void processCandidates(vector<Candidate> const &candidates, vector<ptTria
     } 
 }
 
-static void findPoints(vector<ptTriangle> const &triangles, EllipseInfo &eInfo, Solutions &points){
+void aabbTree::findPoints(vector<ptTriangle> const &triangles, EllipseInfo &eInfo, Solutions &points) {
     for (auto const tr : triangles) {
         if (tr->geometry()) {
             auto gm = tr->geometry();

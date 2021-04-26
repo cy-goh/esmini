@@ -89,23 +89,28 @@ namespace aabbTree {
         CandidateStruct(ptBBox bbx1, ptBBox bbx2) : bbox1(bbx1), bbox2(bbx2) {}
     } Candidate;
 
+    typedef vector<Candidate> Candidates;
+
     class Tree {
     public:
         Tree() : bbox(nullptr), nodeCount_(0) {}
         ~Tree();
-        void intersect(Tree const &tree, vector<Candidate> &candidates) const;
+        void intersect(Tree const &tree, Candidates &candidates) const;
         void build(BBoxVec &bboxes);
+        bool empty();
         vector<ptTree>const &Children() const { return childeren; }
         ptBBox BBox() const { return bbox; }
-        unsigned long nodeCount() { return nodeCount_; }
+        unsigned long nodeCount() const { return nodeCount_; }
+        unsigned long leafCount() const { return leafCount_; }
     private:
         ptBBox bbox;
         vector<ptTree> childeren;
-        unsigned long nodeCount_; // for debug;
+        unsigned long nodeCount_, leafCount_; // for debug;
 
         Tree(Tree const &tree);
         BBoxVec::iterator divide(BBoxVec::iterator const start, BBoxVec::iterator const end, ptBBox bbox);
         void __build(BBoxVec::iterator const start, const BBoxVec::iterator end);
+        void __build(BBoxVec &bboxes);
 
         typedef struct {
             BBoxVec::iterator first, last;
@@ -113,7 +118,6 @@ namespace aabbTree {
         } StackRecord;
     };
 
-    static void processCandidates(vector<Candidate> const &candidates, vector<ptTriangle> &solutions);
-
-    static void findPoints(vector<ptTriangle> const &triangles, vector<Point> &points);
+    void processCandidates(Candidates const &candidates, vector<ptTriangle> &solutions);
+    void findPoints(vector<ptTriangle> const &triangles, EllipseInfo &eInfo, Solutions &points);
 }
