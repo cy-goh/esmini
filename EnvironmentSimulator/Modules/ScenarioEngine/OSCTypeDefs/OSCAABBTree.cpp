@@ -174,34 +174,25 @@ void Tree::__build(BBoxVec::iterator const start, BBoxVec::iterator const end) {
             ptTree pos = make_shared<Tree>();
             ptTree neg = make_shared<Tree>();
 
-            bool pushLast = true;
-            if (cut - first > 0) {
+            if (cut - first > 0 && last - cut > 0) {
+                kids:
                 currentTree().childeren.push_back(pos);
-                nodeCount_++;
-                if (last - cut > 0) {
-                    currentTree().childeren.push_back(neg);
-                    nodeCount_++;
-                    StackRecord record = { cut, last, neg };
-                    stack.push_back(record);
-                }
+                currentTree().childeren.push_back(neg);
+                nodeCount_ += 2;
+                StackRecord record = { cut, last, neg };
+                stack.push_back(record);
                 currentTree_ = pos;
                 last = cut;
-            } else if (last - cut > 0)  {
-                currentTree().childeren.push_back(neg);
-                nodeCount_++;
-                currentTree_ = neg;
-                first = cut;
             } else {
-                // Should never reach this point
-                LOG("WARN: Unreachable case touched");
-                goto stackOp;
-            }            
+                cut = first + (last - first) / 2.0;
+                goto kids;
+            }   
         }
     }
 }
 
 /*
- * It separates the array into two parts according to a partition 
+ * It separates the array in two parts according to a partition 
  * line of the current bounding box.
  * It returns a pointer to the first element of the right side of the partition
  */
@@ -215,24 +206,25 @@ BBoxVec::iterator Tree::divide(BBoxVec::iterator const start, BBoxVec::iterator 
     Point urhc = bbox->urhCorner();
 
     if (urhc.x - blhc.x > urhc.y - blhc.y) {
-        mid = (urhc.x - blhc.x) / 2.0;
+        mid = (urhc.x + blhc.x) / 2.0;
         compare = [mid](ptBBox bbx) {
             return bbx->midPointX() < mid;
         };
     } else {
-        mid = (urhc.y - blhc.y) / 2.0;
+        mid = (urhc.y + blhc.y) / 2.0;
         compare = [mid](ptBBox bbx) {
             return bbx->midPointY() < mid;
         };
     }
-    
+
     auto first = start;
     auto last  = end;
     while (true) {
-        while (compare(*first))
+        while (first < last && compare(*first)) {
             first++;
+        }
         last--;
-        while (!compare(*last))
+        while (first < last && !compare(*last))
             last--;
         if (!(first < last)) return first;
         std::iter_swap(first, last);
@@ -241,16 +233,17 @@ BBoxVec::iterator Tree::divide(BBoxVec::iterator const start, BBoxVec::iterator 
 }
 
 /*
- * It Intersects two trees and pots the possible candidate  bounding boxes
+ * It Intersects two trees and puts the possible candidate bounding boxes in
  * a vector. This function has been adapted from:
  *   https://github.com/ebertolazzi/Clothoids/blob/master/src/AABBtree.cc
  * 
  */
-void Tree::intersect(Tree const &tree, vector<Candidate> &candidates) const {
-    candidates.clear();
-    if (!bbox && !tree.BBox() && !tree.BBox()->collide(bbox)) return;
+void Tree::intersect(Tree const &tree, Candidates &candidates) const {
+    
+    if (!bbox || !tree.BBox() || !tree.BBox()->collide(bbox)) return;
 
-    char case_ = (childeren.empty() ? 0 : 1) + (tree.Children().empty() ? 0 : 2);
+    int case_ = (this->childeren.empty() ? 0 : 1) + (tree.Children().empty() ? 0 : 2);
+
     switch(case_) {
         case 0: { // Leaf & Leaf
             candidates.push_back(Candidate(bbox, tree.BBox()));
