@@ -31,6 +31,13 @@ namespace aabbTree {
     typedef shared_ptr<Tree> ptTree;
     
     typedef vector<ptBBox> BBoxVec;
+    typedef vector<Point> Solutions;
+
+    typedef struct {
+        double SMjA;
+        double SMnA;
+        roadmanager::Position egoPos;
+    } EllipseInfo;
 
     class Point {
     public:

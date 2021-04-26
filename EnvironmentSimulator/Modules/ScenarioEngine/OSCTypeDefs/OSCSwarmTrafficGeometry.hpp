@@ -24,15 +24,10 @@ namespace STGeometry {
 
     using aabbTree::Triangle;
     using aabbTree::Point;
-
-    typedef struct {
-        double SMjA;
-        double SMnA;
-        roadmanager::Position egoPos;
-    } EllipseInfo;
+    using aabbTree::EllipseInfo;
+    using aabbTree::Solutions;
 
     typedef std::function<double(double)> DDProc;
-    typedef std::vector<aabbTree::Point> Solutions;
 
     double inline ellipse(
         double h,
