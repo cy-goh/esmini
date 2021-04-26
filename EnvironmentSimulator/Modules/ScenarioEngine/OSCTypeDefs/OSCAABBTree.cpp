@@ -133,12 +133,17 @@ void Tree::build(BBoxVec &bboxes) {
     childeren.clear();
     if (bboxes.empty()) return;
     nodeCount_ = 1;
+    leafCount_ = 0;
     __build(bboxes.begin(), bboxes.end());
+}
+
+bool Tree::empty() {
+    return (!bbox && childeren.empty());
 }
 
 /*
  * This implements the construction of an AABB Tree.
- * It exploits an iterative algorithm inetead if a recursive one
+ * It exploits an iterative algorithm instead of a recursive one
  * to handle huge networks.
  */
 void Tree::__build(BBoxVec::iterator const start, BBoxVec::iterator const end) {
@@ -160,7 +165,7 @@ void Tree::__build(BBoxVec::iterator const start, BBoxVec::iterator const end) {
     while (last > first) {
         if (last - first == 1) {
             currentTree().bbox = *first; 
-        stackOp:
+            leafCount_++;
             if (!stack.empty()) {
                 auto record = stack.back();
                 stack.pop_back();
