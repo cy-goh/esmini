@@ -44,6 +44,33 @@ namespace STGeometry {
         return pow(e1, 2) + pow(e2, 2) - 1;
     }
 
+    static inline void paramEllipse(
+        double alpha, 
+        double h, 
+        double k, 
+        double SMjA, 
+        double SMnA, 
+        double hdg,
+        double &sx,
+        double &sy
+    ) {
+        double cosAlpha = cos(alpha);
+        double sinAlpha = sin(alpha);
+        double cosHdg   = cos(hdg);
+        double sinHdg   = sin(hdg);
+        sx = SMjA * cosAlpha * cosHdg - SMnA * sinAlpha * sinHdg + h;
+        sy = SMjA * cosAlpha * sinHdg + SMnA * sinAlpha * cosHdg + k;
+    }
+
+    static inline double angleTangentEllipse(double SMjA, double SMnA, double alpha, double hdg) {
+        double cosAlpha = cos(alpha);
+        double sinAlpha = sin(alpha);
+        double cosHdg   = cos(hdg);
+        double sinHdg   = sin(hdg);
+        return atan2((SMjA * sinAlpha * sinHdg - SMnA * cosAlpha * cosHdg),
+                (SMjA * sinAlpha * cosHdg + SMnA * cosAlpha * sinHdg));
+    }
+
     /*
      * Line considered in the form y = mx + q
      * @m: angular coefficient of the line
