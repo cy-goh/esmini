@@ -159,7 +159,7 @@ namespace scenarioengine
 				transition_ = Transition::END_TRANSITION;
 				next_state_ = State::STANDBY;
 			}
-			else if (state_ == State::COMPLETE)
+			else if (state_ == State::COMPLETE) // Ghost-project. Call from ResetEvents().
 			{
 				transition_ = Transition::UNDEFINED_ELEMENT_TRANSITION;
 				next_state_ = State::STANDBY;

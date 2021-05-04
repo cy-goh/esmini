@@ -991,7 +991,7 @@ void ScenarioEngine::SetupGhost(Object* object)
 		}
 	}
 }
-
+// Reset events finished by ghost
 void ScenarioEngine::ResetEvents()
 {
 	printf("Trying to reset event");
