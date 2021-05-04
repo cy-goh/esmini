@@ -48,6 +48,8 @@ namespace scenarioengine
 		void ReplaceObjectInTrigger(Trigger* trigger, Object* obj1, Object* obj2, double timeOffset, Event* event = 0);
 		void SetupGhost(Object* object);
 
+		void ResetEvents();
+
 		std::string getScenarioFilename() { return scenarioReader->getScenarioFilename(); }
 		std::string getSceneGraphFilename() { return roadNetwork.sceneGraphFile.filepath; }
 		std::string getOdrFilename() { return roadNetwork.logicFile.filepath; }

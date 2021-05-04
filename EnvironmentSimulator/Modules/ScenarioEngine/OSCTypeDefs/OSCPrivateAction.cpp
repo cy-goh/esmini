@@ -759,14 +759,15 @@ void TeleportAction::Start()
 {
 	OSCAction::Start();
 	//ScenarioEngine myEngine = new ScenarioEngine();
-	LOG("Teleport time for %s :", object_->name_.c_str());
+	//LOG("Teleport time for %s :", object_->name_.c_str());
 	if (object_->IsGhost() && scenarioEngine_->getSimulationTime() > 0)
 	{
-		printf("Time: %.2f \n", scenarioEngine_->getSimulationTime());
+		//printf("Time: %.2f \n", scenarioEngine_->getSimulationTime());
 		scenarioEngine_->SetSimulationTime(scenarioEngine_->getSimulationTime() - scenarioEngine_->GetHeadstartTime());
-		printf("Trail: %d \n", object_->trail_.GetNumberOfVertices());
+		//printf("Trail: %d \n", object_->trail_.GetNumberOfVertices());
 		object_->trail_.Reset();
-		printf("Trail: %d \n", object_->trail_.GetNumberOfVertices());
+		//printf("Trail: %d \n", object_->trail_.GetNumberOfVertices());
+		scenarioEngine_->ResetEvents();
 	}
 
 	if (object_->GetControllerMode() == Controller::Mode::MODE_OVERRIDE &&

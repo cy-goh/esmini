@@ -110,11 +110,12 @@ ScenarioEngine::~ScenarioEngine()
 
 void ScenarioEngine::step(double deltaSimTime)
 {
-
+	
 	simulationTime_ += deltaSimTime;
 	if (simulationTime_ >= fakeTime_)
 	{
 		fakeTime_ = simulationTime_;
+		//printf("Faketime: %.2f \n", fakeTime_);
 	}
 
 	if (entities.object_.size() == 0)
@@ -215,7 +216,7 @@ void ScenarioEngine::step(double deltaSimTime)
 	for (size_t i = 0; i < storyBoard.story_.size(); i++)
 	{
 		Story *story = storyBoard.story_[i];
-
+		
 		for (size_t j = 0; j < story->act_.size(); j++)
 		{
 			Act *act = story->act_[j];
@@ -241,7 +242,7 @@ void ScenarioEngine::step(double deltaSimTime)
 					act->End();
 				}
 			}
-
+			
 			act->UpdateState();
 
 			// Check whether this act is done - and update flag for all acts
@@ -264,7 +265,6 @@ void ScenarioEngine::step(double deltaSimTime)
 					}
 				}
 			}
-
 			// Maneuvers
 			if (act->IsActive())
 			{
@@ -298,23 +298,30 @@ void ScenarioEngine::step(double deltaSimTime)
 											{
 												if (maneuver->event_[n]->IsActive())
 												{
-													for (size_t o = 0; o < maneuver->event_[n]->action_.size(); o++)
+													for (size_t o = 0; o < maneuver->event_[n]->start_trigger_->conditionGroup_.size(); o++)
 													{
-														OSCAction* action = maneuver->event_[n]->action_[o];
-														OSCPrivateAction* pa = (OSCPrivateAction*)action;
-														if (pa->object_->IsGhost() && pa->type_ != OSCPrivateAction::ActionType::TELEPORT)
+														for (size_t p = 0; p < maneuver->event_[n]->start_trigger_->conditionGroup_[o]->condition_.size(); p++)
 														{
-															maneuver->event_[n]->Reset();
-															LOG("Event %s reseted, overwritten by event %s",
-																maneuver->event_[n]->name_.c_str(), event->name_.c_str());
-														}
-														else
-														{
-															maneuver->event_[n]->End();
-															LOG("Event %s ended, overwritten by event %s",
-																maneuver->event_[n]->name_.c_str(), event->name_.c_str());
+															OSCCondition* cond = maneuver->event_[n]->start_trigger_->conditionGroup_[o]->condition_[p];
+															TrigByEntity* trig = (TrigByEntity*)cond;
+															for (size_t q = 0; q < trig->triggering_entities_.entity_.size(); q++)
+															{
+																if (trig->triggering_entities_.entity_[q].object_->IsGhost())
+																{
+																	maneuver->event_[n]->Reset();
+																	LOG("Event %s reseted, overwritten by event %s",
+																		maneuver->event_[n]->name_.c_str(), event->name_.c_str());
+																}
+																else
+																{
+																	maneuver->event_[n]->End();
+																	LOG("Event %s ended, overwritten by event %s",
+																		maneuver->event_[n]->name_.c_str(), event->name_.c_str());
+																}
+															}
 														}
 													}
+														
 													/*maneuver->event_[n]->End();
 													LOG("Event %s ended, overwritten by event %s",
 														maneuver->event_[n]->name_.c_str(), event->name_.c_str());*/
@@ -364,9 +371,40 @@ void ScenarioEngine::step(double deltaSimTime)
 								{
 									if (event->action_[n]->IsActive())
 									{
-										event->action_[n]->Step(deltaSimTime, getSimulationTime());
+										// Try one
+										OSCAction* action = event->action_[n];
+										OSCPrivateAction* pa = (OSCPrivateAction*)action;
+										if (fakeTime_ <= simulationTime_ || pa->object_->IsGhost())
+										{
+											event->action_[n]->Step(deltaSimTime, getSimulationTime());
 
-										active = active || (event->action_[n]->IsActive());
+											active = active || (event->action_[n]->IsActive());
+										}
+										else
+										{
+											active = true;
+										}
+
+										// Try two
+										/*OSCAction* action = event->action_[n];
+										OSCPrivateAction* pa = (OSCPrivateAction*)action;
+										if (pa->object_->IsGhost())
+										{
+											event->action_[n]->Step(deltaSimTime, getSimulationTime());
+
+											active = active || (event->action_[n]->IsActive());
+										}
+										else
+										{
+											event->action_[n]->Step(deltaSimTime, GetFakeTime());
+
+											active = active || (event->action_[n]->IsActive());
+										}*/
+
+										// Original
+										/*event->action_[n]->Step(deltaSimTime, getSimulationTime());
+
+										active = active || (event->action_[n]->IsActive());*/
 									}
 								}
 								if (!active)
@@ -384,7 +422,6 @@ void ScenarioEngine::step(double deltaSimTime)
 
 	for (size_t i = 0; i < entities.object_.size(); i++)
 	{
-
 		Object* obj = entities.object_[i];
 		//printf("Name: %s  ", obj->name_.c_str());
 		//printf("Trail: %d \n", obj->trail_.GetNumberOfVertices());
@@ -809,6 +846,8 @@ void ScenarioEngine::ReplaceObjectInTrigger(Trigger* trigger, Object* obj1, Obje
 							trig->triggering_entities_.entity_[k].object_ = obj2;
 						}
 						// Changes added to do action when target is triggering
+
+						// This else should be somewhere else
 						else if (trig->triggering_entities_.entity_[k].object_ != obj1)
 						{
 							TeleportAction* myNewAction = new TeleportAction;
@@ -850,8 +889,23 @@ void ScenarioEngine::ReplaceObjectInTrigger(Trigger* trigger, Object* obj1, Obje
 				TrigByValue* trig = (TrigByValue*)cond;
 				if (trig->type_ == TrigByValue::Type::SIMULATION_TIME)
 				{
-					((TrigBySimulationTime*)(trig))->value_; // += timeOffset;
+					((TrigBySimulationTime*)(trig))->value_ += timeOffset;
 				}
+			}
+			else if (cond->base_type_ == OSCCondition::ConditionType::BY_STATE)
+			{
+				TeleportAction* myNewAction = new TeleportAction;
+				roadmanager::Position* pos = new roadmanager::Position();
+				pos->SetInertiaPos(0, 0, 0);
+				pos->SetRelativePosition(&obj1->pos_, roadmanager::Position::PositionType::RELATIVE_OBJECT);
+				myNewAction->position_ = pos;
+				myNewAction->type_ = OSCPrivateAction::ActionType::TELEPORT;
+				myNewAction->object_ = obj2;
+				myNewAction->scenarioEngine_ = this;
+				//myNewAction->object_ = entities.object_[1];
+
+				//event->action_.push_back(myNewAction);
+				event->action_.insert(event->action_.begin(), myNewAction);
 			}
 		}
 	}
@@ -930,6 +984,57 @@ void ScenarioEngine::SetupGhost(Object* object)
 						{
 							ReplaceObjectInTrigger(event->start_trigger_, object, ghost, -ghost->GetHeadstartTime(), event);
 
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+void ScenarioEngine::ResetEvents()
+{
+	printf("Trying to reset event");
+	for (size_t i = 0; i < storyBoard.story_.size(); i++)
+	{
+		Story* story = storyBoard.story_[i];
+
+		for (size_t j = 0; j < story->act_.size(); j++)
+		{
+			Act* act = story->act_[j];
+
+			for (size_t k = 0; k < act->maneuverGroup_.size(); k++)
+			{
+				for (size_t l = 0; l < act->maneuverGroup_[k]->maneuver_.size(); l++)
+				{
+					OSCManeuver* maneuver = act->maneuverGroup_[k]->maneuver_[l];
+
+					for (size_t m = 0; m < maneuver->event_.size(); m++)
+					{
+						Event* event = maneuver->event_[m];
+
+						if (event->state_ == StoryBoardElement::State::COMPLETE)
+						{
+							bool NoTele = true;
+							for (size_t n = 0; n < event->action_.size(); n++)
+							{
+								OSCAction* action = event->action_[n];
+								OSCPrivateAction* pa = (OSCPrivateAction*)action;
+								if (pa->type_ == OSCPrivateAction::ActionType::TELEPORT)
+								{
+									NoTele = false;
+								}
+							}
+							for (size_t n = 0; n < event->action_.size(); n++)
+							{
+								OSCAction* action = event->action_[n];
+								OSCPrivateAction* pa = (OSCPrivateAction*)action;
+
+								if (NoTele && pa->object_->IsGhost())
+								{
+									event->Standby();
+								}
+							}
 						}
 					}
 				}

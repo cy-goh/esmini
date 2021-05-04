@@ -159,6 +159,11 @@ namespace scenarioengine
 				transition_ = Transition::END_TRANSITION;
 				next_state_ = State::STANDBY;
 			}
+			else if (state_ == State::COMPLETE)
+			{
+				transition_ = Transition::UNDEFINED_ELEMENT_TRANSITION;
+				next_state_ = State::STANDBY;
+			}
 			else
 			{
 				LOG("Invalid transition requested from %s to %s", state2str(state_).c_str(), state2str(State::STANDBY).c_str());
