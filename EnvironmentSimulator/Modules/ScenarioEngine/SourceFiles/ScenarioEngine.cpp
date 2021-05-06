@@ -302,7 +302,9 @@ void ScenarioEngine::step(double deltaSimTime)
 													{
 														for (size_t p = 0; p < maneuver->event_[n]->start_trigger_->conditionGroup_[o]->condition_.size(); p++)
 														{
-															OSCCondition* cond = maneuver->event_[n]->start_trigger_->conditionGroup_[o]->condition_[p];
+														    maneuver->event_[n]->End();
+															LOG("Event %s ended, overwritten by event %s", maneuver->event_[n]->name_.c_str(), event->name_.c_str());
+															/*OSCCondition* cond = maneuver->event_[n]->start_trigger_->conditionGroup_[o]->condition_[p];
 															TrigByEntity* trig = (TrigByEntity*)cond;
 															for (size_t q = 0; q < trig->triggering_entities_.entity_.size(); q++)
 															{
@@ -318,7 +320,7 @@ void ScenarioEngine::step(double deltaSimTime)
 																	LOG("Event %s ended, overwritten by event %s",
 																		maneuver->event_[n]->name_.c_str(), event->name_.c_str());
 																}
-															}
+															}*/
 														}
 													}
 														
@@ -994,7 +996,7 @@ void ScenarioEngine::SetupGhost(Object* object)
 // Reset events finished by ghost
 void ScenarioEngine::ResetEvents()
 {
-	printf("Trying to reset event");
+	// printf("Trying to reset event");
 	for (size_t i = 0; i < storyBoard.story_.size(); i++)
 	{
 		Story* story = storyBoard.story_[i];
@@ -1013,7 +1015,7 @@ void ScenarioEngine::ResetEvents()
 					{
 						Event* event = maneuver->event_[m];
 
-						if (event->state_ == StoryBoardElement::State::COMPLETE)
+						if (event->state_ == StoryBoardElement::State::COMPLETE || event->next_state_ == StoryBoardElement::State::COMPLETE)
 						{
 							bool NoTele = true;
 							for (size_t n = 0; n < event->action_.size(); n++)
@@ -1032,7 +1034,7 @@ void ScenarioEngine::ResetEvents()
 
 								if (NoTele && pa->object_->IsGhost())
 								{
-									event->Standby();
+									event->Reset();
 								}
 							}
 						}
