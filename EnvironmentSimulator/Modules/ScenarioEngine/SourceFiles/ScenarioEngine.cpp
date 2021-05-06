@@ -298,35 +298,9 @@ void ScenarioEngine::step(double deltaSimTime)
 											{
 												if (maneuver->event_[n]->IsActive())
 												{
-													for (size_t o = 0; o < maneuver->event_[n]->start_trigger_->conditionGroup_.size(); o++)
-													{
-														for (size_t p = 0; p < maneuver->event_[n]->start_trigger_->conditionGroup_[o]->condition_.size(); p++)
-														{
-														    maneuver->event_[n]->End();
-															LOG("Event %s ended, overwritten by event %s", maneuver->event_[n]->name_.c_str(), event->name_.c_str());
-															/*OSCCondition* cond = maneuver->event_[n]->start_trigger_->conditionGroup_[o]->condition_[p];
-															TrigByEntity* trig = (TrigByEntity*)cond;
-															for (size_t q = 0; q < trig->triggering_entities_.entity_.size(); q++)
-															{
-																if (trig->triggering_entities_.entity_[q].object_->IsGhost())
-																{
-																	maneuver->event_[n]->Reset();
-																	LOG("Event %s reseted, overwritten by event %s",
-																		maneuver->event_[n]->name_.c_str(), event->name_.c_str());
-																}
-																else
-																{
-																	maneuver->event_[n]->End();
-																	LOG("Event %s ended, overwritten by event %s",
-																		maneuver->event_[n]->name_.c_str(), event->name_.c_str());
-																}
-															}*/
-														}
-													}
-														
-													/*maneuver->event_[n]->End();
+													maneuver->event_[n]->End();
 													LOG("Event %s ended, overwritten by event %s",
-														maneuver->event_[n]->name_.c_str(), event->name_.c_str());*/
+													maneuver->event_[n]->name_.c_str(), event->name_.c_str());
 												}
 											}
 
