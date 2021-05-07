@@ -357,7 +357,7 @@ namespace STGeometry {
         double x, y, hdg;
         spiral->EvaluateDS(res, &x, &y, &hdg);
         auto pos = sol.size();
-        sol.push_back(aabbTree::Point(x,y));
+        sol.push_back(aabbTree::Point(x,y, hdg));
         checkRange(triangle, sol, pos); // Maybe useless call
         return !sol.empty();
     }
