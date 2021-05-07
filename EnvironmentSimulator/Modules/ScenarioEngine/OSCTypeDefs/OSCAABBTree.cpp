@@ -299,7 +299,7 @@ void aabbTree::findPoints(vector<ptTriangle> const &triangles, EllipseInfo &eInf
     for (auto const tr : triangles) {
         if (tr->geometry()) {
             auto gm = tr->geometry();
-            switch (gm->GetType()) {
+            /*switch (gm->GetType()) {
                 case gm->GEOMETRY_TYPE_UNKNOWN: {
                     break;
                 }
@@ -320,7 +320,8 @@ void aabbTree::findPoints(vector<ptTriangle> const &triangles, EllipseInfo &eInf
 			    case gm->GEOMETRY_TYPE_PARAM_POLY3: {
                     break;
                 }
-            }
+            }*/
+            geometryIntersect(*tr, eInfo, points);
         } else 
             LOG("Warning: triangle without a geometry found");
     }
