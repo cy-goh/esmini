@@ -162,11 +162,11 @@ namespace scenarioengine
 		//curveInfo circle_, ellipse_;
 		std::vector<SpawnInfo> spawnedV;
 		roadmanager::OpenDrive* odrManager_;
-		double innerRadius_, semiMajorAxis_, semiMinorAxis_, midSMjA, midSMnA, minSize_;
+		double innerRadius_, semiMajorAxis_, semiMinorAxis_, midSMjA, midSMnA, minSize_, lastTime;
 		int numberOfVehicles;
 
 		void createRoadSegments(aabbTree::BBoxVec &vec);
-		void createEllipseSegments(aabbTree::BBoxVec &vec);
+		void createEllipseSegments(aabbTree::BBoxVec &vec, double SMjA, double SMnA);
 		void spawn(Solutions sols, int replace, double simTime);
 		bool ensureDistance(roadmanager::Position pos, int lane);
 		int despawn(double simTime);
