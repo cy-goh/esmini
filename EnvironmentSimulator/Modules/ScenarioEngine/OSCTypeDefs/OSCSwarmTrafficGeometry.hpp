@@ -338,24 +338,24 @@ namespace STGeometry {
     }
 
     // Any check to see if the spiral is a line or a curve must be performed outside this routine
-    static bool clothoidIntersect(Triangle &triangle, EllipseInfo &eInfo, Solutions &sol) {
+    static bool geometryIntersect(Triangle &triangle, EllipseInfo &eInfo, Solutions &sol) {
         double res;
         double h, k, A, SMjA, SMnA;
-        roadmanager::Spiral *spiral = static_cast<roadmanager::Spiral*>(triangle.geometry());
+        roadmanager::Geometry *geometry = (triangle.geometry());
         h = eInfo.egoPos.GetX();
         k = eInfo.egoPos.GetY();
         A = eInfo.egoPos.GetH();
         SMjA = eInfo.SMjA;
         SMnA = eInfo.SMnA;
 
-        DDProc ellipseP = [h, k, A, SMjA, SMnA, spiral](double s) {
+        DDProc ellipseP = [h, k, A, SMjA, SMnA, geometry](double s) {
             double x, y, hdg, e;
-            spiral->EvaluateDS(s, &x, &y, &hdg);
+            geometry->EvaluateDS(s, &x, &y, &hdg);
             return ellipse(h, k, A, SMjA, SMnA, x, y);
         };
         if (!brent_zeros(triangle.sI, triangle.sF, res, SMALL_NUMBER, ellipseP)) return false;
         double x, y, hdg;
-        spiral->EvaluateDS(res, &x, &y, &hdg);
+        geometry->EvaluateDS(res, &x, &y, &hdg);
         auto pos = sol.size();
         sol.push_back(aabbTree::Point(x,y, hdg));
         checkRange(triangle, sol, pos); // Maybe useless call
