@@ -90,33 +90,6 @@ namespace scenarioengine
 	class SwarmTrafficAction : public OSCGlobalAction
 	{
 	public:
-		
-		/*typedef struct {
-			roadmanager::Road* road;
-            int                segmentIdx;
-			double             x;
-			double             y;
-			double             h;
-		} pointInfo;
-
-		struct pointRef {
-			roadmanager::Road*    road;
-			Vehicle*              last;
-            int                   segmentIdx;
-			roadmanager::Position pos;
-
-			pointRef() : last(NULL) {}
-			pointRef operator=(pointInfo ptInfo) {
-                road       = ptInfo.road;
-				segmentIdx = ptInfo.segmentIdx;
-				pos.XYZH2TrackPos(ptInfo.x, ptInfo.y, 0, ptInfo.h);
-				return *this;
-			}
-		};
-
-		typedef struct {
-			pointRef upper, lower;
-		} curveInfo;*/
 
 		struct SpawnInfo{
 			int vehicleID;
