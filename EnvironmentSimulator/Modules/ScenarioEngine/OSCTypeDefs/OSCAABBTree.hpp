@@ -41,10 +41,11 @@ namespace aabbTree {
 
     class Point {
     public:
-        double x, y;
+        double x, y, h;
         Point(double x_, double y_) : x(x_), y(y_) {};
-        Point(Point const &pt) : x(pt.x), y(pt.y) {};
-        Point() : x(0), y(0) {};
+        Point(double x_, double y_, double h_) : x(x_), y(y_), h(h_) {};
+        Point(Point const &pt) : x(pt.x), y(pt.y), h(pt.h) {};
+        Point() : x(0), y(0), h(0) {};
     };
 
     class Triangle {
