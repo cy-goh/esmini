@@ -1316,7 +1316,7 @@ OSCGlobalAction *ScenarioReader::parseOSCGlobalAction(pugi::xml_node actionNode)
 				trafficSwarmAction->SetCentralObject(entities_->GetObjectByName(parameters.ReadAttribute(childNode, "entityRef")));
 				//childNode = trafficChild.child("")
 
-				std::string radius;
+				std::string radius, numberOfVehicles;
 
 				// Inner radius (Circle)
 				radius = parameters.ReadAttribute(trafficChild, "innerRadius");
@@ -1331,6 +1331,9 @@ OSCGlobalAction *ScenarioReader::parseOSCGlobalAction(pugi::xml_node actionNode)
 				trafficSwarmAction->SetSemiMinorAxes(std::stod(radius));
 
 				trafficSwarmAction->SetEntities(entities_);
+
+				numberOfVehicles = parameters.ReadAttribute(trafficChild, "numberOfVehicles");
+				trafficSwarmAction->SetNumberOfVehicles(std::stoi(numberOfVehicles));
 
 				action = trafficSwarmAction;
 			}
