@@ -21,6 +21,8 @@
 namespace scenarioengine
 {
 
+	using aabbTree::Solutions;
+
 	class OSCGlobalAction : public OSCAction
 	{
 	public:
@@ -89,7 +91,7 @@ namespace scenarioengine
 	{
 	public:
 		
-		typedef struct {
+		/*typedef struct {
 			roadmanager::Road* road;
             int                segmentIdx;
 			double             x;
@@ -114,14 +116,22 @@ namespace scenarioengine
 
 		typedef struct {
 			pointRef upper, lower;
-		} curveInfo;
+		} curveInfo;*/
+
+		struct SpawnInfo{
+			int vehicleID;
+			int outMidAreaCount;
+			int roadID;
+			int lane;
+			double simTime;
+		};
 		
 		SwarmTrafficAction() : OSCGlobalAction(OSCGlobalAction::Type::SWARM_TRAFFIC), centralObject_(0) {
-			vehiclesId_.clear();
+			spawnedV.clear();
 		};
 
 		SwarmTrafficAction(const SwarmTrafficAction& action) : OSCGlobalAction(OSCGlobalAction::Type::SWARM_TRAFFIC) {
-		    vehiclesId_.clear();
+		    spawnedV.clear();
 		}
 
 		OSCGlobalAction* Copy() {
@@ -142,22 +152,24 @@ namespace scenarioengine
 		void SetSemiMajorAxes(double axes)        { semiMajorAxis_ = axes;       }
 		void SetSemiMinorAxes(double axes)        { semiMinorAxis_ = axes;       }
 		void SetEntities(Entities* entities)      { entities_      = entities;   }
+		void SetNumberOfVehicles(int number)      { numberOfVehicles = number;   }
 
     private:
 
 		Entities *entities_;
 		Object* centralObject_;
 		aabbTree::ptTree rTree;
-		curveInfo circle_, ellipse_;
-		std::vector<int> vehiclesId_;
+		//curveInfo circle_, ellipse_;
+		std::vector<SpawnInfo> spawnedV;
 		roadmanager::OpenDrive* odrManager_;
-		double innerRadius_, semiMajorAxis_, semiMinorAxis_, minSize_;
+		double innerRadius_, semiMajorAxis_, semiMinorAxis_, midSMjA, midSMnA, minSize_;
+		int numberOfVehicles;
 
 		void createRoadSegments(aabbTree::BBoxVec &vec);
 		void createEllipseSegments(aabbTree::BBoxVec &vec);
-		void spawn(pointRef &segment, int lane, double hdg_offset);
-		bool detectPoints();
-		void despawn();
+		void spawn(Solutions sols, int replace, double simTime);
+		bool ensureDistance(roadmanager::Position pos, int lane);
+		int despawn(double simTime);
 	};
 }
 
