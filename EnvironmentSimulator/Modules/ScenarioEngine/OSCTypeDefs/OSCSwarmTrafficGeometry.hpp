@@ -289,7 +289,7 @@ namespace STGeometry {
      * interval (a, b) and a tollerance 'delta'. The result
      * is saved in 'res' and the function returns true if a solution is found 
      */
-    static bool brent_zeros(int a, int b, double &res, double delta, DDProc f) {
+    static bool brent_zeros(double a, double b, double &res, double delta, DDProc f) {
         double fa, fb, fc, fs, c, d, s;
         bool flag;
         fa = f(a);
