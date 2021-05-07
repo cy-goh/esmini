@@ -284,8 +284,8 @@ void Tree::intersect(Tree const &tree, Candidates &candidates) const {
 
 void aabbTree::processCandidates(Candidates const &candidates, vector<ptTriangle> &solutions) {
     for (auto const candidate : candidates) {
-        ptTriangle const &tr1 = candidate.bbox1->triangle();
-        ptTriangle const &tr2 = candidate.bbox2->triangle();
+        ptTriangle const tr1 = candidate.bbox1->triangle();
+        ptTriangle const tr2 = candidate.bbox2->triangle();
         if (tr1->collide(tr2)) {
             if (tr2->geometry())
                 solutions.push_back(tr2);
