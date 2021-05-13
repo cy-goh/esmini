@@ -1,12 +1,19 @@
 #include <stdio.h>
+#include <fstream>
 #include "esminiRMLib.hpp"
 
 int main(int argc, char* argv[])
 {
-	RM_Init("../resources/xodr/straight_500m_signs.xodr");
+	RM_Init("/home/cy/Downloads/gd.xodr");
+	std::ofstream myfile;
+	static char strbuf[1024];
+	myfile.open("/home/cy/Desktop/points2.csv");
 
 	// Print some basic info
 	printf("nrOfRoads: %d\n", RM_GetNumberOfRoads());
+
+	myfile << "Road sign id name x y z heading orientation z_offset height width" << std::endl;
+
 	for (int i = 0; i < RM_GetNumberOfRoads(); i++)
 	{
 		int rid = RM_GetIdOfRoadFromIndex(i);
@@ -20,8 +27,14 @@ int main(int argc, char* argv[])
 			RM_GetRoadSign(rid, j, &rs);
 			printf("Road[%d] sign[%d] id %d name %s x %.2f y %.2f z %.2f heading %.2f orientation %d z_offset %.2f height: %.2f width %.2f\n",
 				i, j, rs.id, rs.name, rs.x, rs.y, rs.z, rs.h, rs.orientation, rs.z_offset, rs.height, rs.width);
+
+			snprintf(strbuf, sizeof(strbuf), "%d %d %d %s %.2f %.2f %.2f %.2f %d %.2f %.2f %.2f\n",
+				i, j, rs.id, rs.name, rs.x, rs.y, rs.z, rs.h, rs.orientation, rs.z_offset, rs.height, rs.width);
+			myfile << strbuf;
 		}
 	}
+
+	myfile.close();
 
 	// Create a position object
 	int p0 = RM_CreatePosition();

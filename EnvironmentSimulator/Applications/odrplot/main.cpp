@@ -23,8 +23,47 @@
 #include <fstream>
 #include "RoadManager.hpp"
 #include "CommonMini.hpp"
+#include <sstream>
 
 using namespace roadmanager;
+
+std::string enum2string(roadmanager::LaneRoadMark::RoadMarkType rm){
+	std::string ret("NONE");
+	switch (rm) {
+		case roadmanager::LaneRoadMark::RoadMarkType::NONE_TYPE:
+			ret = "NONE";
+			break;
+		case roadmanager::LaneRoadMark::RoadMarkType::SOLID:
+			ret = "SOLID";
+			break;
+		case roadmanager::LaneRoadMark::RoadMarkType::BROKEN:
+			ret = "BROKEN";
+			break;
+		case roadmanager::LaneRoadMark::RoadMarkType::SOLID_SOLID:
+			ret = "SOLID_SOLID";
+			break;
+		case roadmanager::LaneRoadMark::RoadMarkType::SOLID_BROKEN:
+			ret = "SOLID_BROKEN";
+			break;
+		case roadmanager::LaneRoadMark::RoadMarkType::BROKEN_SOLID:
+			ret = "BROKEN_SOLID";
+			break;
+		case roadmanager::LaneRoadMark::RoadMarkType::BROKEN_BROKEN:
+			ret = "BROKEN_BROKEN";
+			break;
+		case roadmanager::LaneRoadMark::RoadMarkType::BOTTS_DOTS:
+			ret = "BOTTS_DOTS";
+			break;
+		case roadmanager::LaneRoadMark::RoadMarkType::GRASS:
+			ret = "GRASS";
+			break;
+		case roadmanager::LaneRoadMark::RoadMarkType::CURB:
+			ret = "CURB";
+			break;
+	}
+
+	return ret;
+}
 
 int main(int argc, char *argv[])
 {
@@ -90,16 +129,31 @@ int main(int argc, char *argv[])
 				Lane *lane = lane_section->GetLaneByIdx(j);
 
 				file << "lane, " << road->GetId() << ", " << i << ", " << lane->GetId() << (lane->IsDriving() ? ", driving" : ", no-driving") << std::endl;
+				
+				roadmanager::LaneRoadMark::RoadMarkType rmType;
 
 				for (int k = 0; k < steps + 1; k++)
 				{
 					double s = MIN(s_end, s_start + k * step_length);
+					float maxSOffset = -1.f;
+					float widthRoadMark = -1;
+
+					for (int l = 0; l < lane->GetNumberOfRoadMarks(); ++l) 
+					{
+						auto rm = lane->GetLaneRoadMarkByIdx(l);
+						auto rmSOffset = rm->GetSOffset(); 
+						if (rmSOffset <= s && rmSOffset > maxSOffset){
+							rmType = rm->GetType();
+							maxSOffset = rmSOffset;
+							widthRoadMark = rm->GetWidth();
+						}
+					}
 
 					// Set lane offset to half the lane width in order to mark the outer edge of the lane (laneOffset = 0 means middle of lane)
 					pos->SetLanePos(road->GetId(), lane->GetId(), s, SIGN(lane->GetId())*lane_section->GetWidth(s, lane->GetId())*0.5, i);
 
 					// Write the point to file
-					snprintf(strbuf, sizeof(strbuf), "%f, %f, %f, %f\n", pos->GetX(), pos->GetY(), pos->GetZ(), pos->GetH());
+					snprintf(strbuf, sizeof(strbuf), "%f, %f, %f, %f, %s, %f\n", pos->GetX(), pos->GetY(), pos->GetZ(), pos->GetH(), enum2string(rmType).c_str(), widthRoadMark);
 					file << strbuf;
 				}
 			}
