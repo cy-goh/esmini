@@ -312,6 +312,58 @@ void ScenarioGateway::reportObject(int id, std::string name, int obj_type, int o
 	}
 }
 
+void ScenarioGateway::reportObjectVel(int id, double x_vel, double y_vel, double z_vel)
+{
+	ObjectState* obj_state = getObjectStatePtrById(id);
+
+	if (obj_state == nullptr)
+	{
+		LOG_ONCE("Can't set velocity for object %d yet. Please register object using reportObject() first.");
+		return;
+	}
+
+	obj_state->state_.pos.SetVel(x_vel, y_vel, z_vel);
+}
+
+void ScenarioGateway::reportObjectAcc(int id, double x_acc, double y_acc, double z_acc)
+{
+	ObjectState* obj_state = getObjectStatePtrById(id);
+
+	if (obj_state == nullptr)
+	{
+		LOG_ONCE("Can't set acceleration for object %d yet. Please register object using reportObject() first.");
+		return;
+	}
+
+	obj_state->state_.pos.SetAcc(x_acc, y_acc, z_acc);
+}
+
+void ScenarioGateway::reportObjectAngularVel(int id, double h_rate, double p_rate, double r_rate)
+{
+	ObjectState* obj_state = getObjectStatePtrById(id);
+
+	if (obj_state == nullptr)
+	{
+		LOG_ONCE("Can't set angular velocity for object %d yet. Please register object using reportObject() first.");
+		return;
+	}
+
+	obj_state->state_.pos.SetAngularVel(h_rate, p_rate, r_rate);
+}
+
+void ScenarioGateway::reportObjectAngularAcc(int id, double h_acc, double p_acc, double r_acc)
+{
+	ObjectState* obj_state = getObjectStatePtrById(id);
+
+	if (obj_state == nullptr)
+	{
+		LOG_ONCE("Can't set angular acceleration for object %d yet. Please register object using reportObject() first.");
+		return;
+	}
+
+	obj_state->state_.pos.SetAngularAcc(h_acc, p_acc, r_acc);
+}
+
 void ScenarioGateway::removeObject(int id)
 {
 	for (size_t i = 0; i < objectState_.size(); i++) 
@@ -371,8 +423,8 @@ int ScenarioGateway::RecordToFile(std::string filename, std::string odr_filename
 			return -1;
 		}
 		ReplayHeader header;
-		strncpy(header.odr_filename, FileNameOf(odr_filename).c_str(), REPLAY_FILENAME_SIZE);
-		strncpy(header.model_filename, FileNameOf(model_filename).c_str(), REPLAY_FILENAME_SIZE);
+		strncpy(header.odr_filename, odr_filename.c_str(), REPLAY_FILENAME_SIZE);
+		strncpy(header.model_filename, model_filename.c_str(), REPLAY_FILENAME_SIZE);
 
 		data_file_.write((char*)&header, sizeof(header));
 	}

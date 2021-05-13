@@ -97,6 +97,8 @@ OSIReporter::OSIReporter()
 
 	// Counter for OSI update
 	osi_update_counter_ = 0;
+
+	nanosec_ = 0xffffffffffffffff; // indicate not set
 }
 
 OSIReporter::~OSIReporter()
@@ -206,8 +208,10 @@ void OSIReporter::ReportSensors(std::vector<ObjectSensor*> sensor)
 			mobj->mutable_base()->mutable_position()->set_z(sensor[i]->hitList_[j].z_);
 			mobj->mutable_base()->mutable_velocity()->set_x(sensor[i]->hitList_[j].velX_);
 			mobj->mutable_base()->mutable_velocity()->set_y(sensor[i]->hitList_[j].velY_);
+			mobj->mutable_base()->mutable_velocity()->set_z(sensor[i]->hitList_[j].velZ_);
 			mobj->mutable_base()->mutable_acceleration()->set_x(sensor[i]->hitList_[j].accX_);
 			mobj->mutable_base()->mutable_acceleration()->set_y(sensor[i]->hitList_[j].accY_);
+			mobj->mutable_base()->mutable_acceleration()->set_z(sensor[i]->hitList_[j].accZ_);
 			mobj->mutable_base()->mutable_orientation()->set_yaw(sensor[i]->hitList_[j].yaw_);
 			mobj->mutable_base()->mutable_orientation_rate()->set_yaw(sensor[i]->hitList_[j].yawRate_);
 			mobj->mutable_base()->mutable_orientation_acceleration()->set_yaw(sensor[i]->hitList_[j].yawAcc_);
@@ -361,10 +365,20 @@ int OSIReporter::UpdateOSIStaticGroundTruth(std::vector<ObjectState*> objectStat
 
 int OSIReporter::UpdateOSIDynamicGroundTruth(std::vector<ObjectState*> objectState)
 {
-	obj_osi_internal.gt->mutable_timestamp()->set_seconds((int64_t)objectState[0]->state_.info.timeStamp);
-	obj_osi_internal.gt->mutable_timestamp()->set_nanos((uint32_t)(
-		(objectState[0]->state_.info.timeStamp - (int64_t)objectState[0]->state_.info.timeStamp) * 1e9)
-	);
+	if (IsTimeStampSetExplicit())
+	{
+		// use excplicit timestamp
+		obj_osi_internal.gt->mutable_timestamp()->set_seconds((int64_t)(nanosec_ / 1000000000));
+		obj_osi_internal.gt->mutable_timestamp()->set_nanos((uint32_t)(nanosec_ % 1000000000));
+	}
+	else
+	{
+		// use timstamp from object state
+		obj_osi_internal.gt->mutable_timestamp()->set_seconds((int64_t)objectState[0]->state_.info.timeStamp);
+		obj_osi_internal.gt->mutable_timestamp()->set_nanos((uint32_t)(
+			(objectState[0]->state_.info.timeStamp - (int64_t)objectState[0]->state_.info.timeStamp) * 1e9)
+		);
+	}
 
 	for (size_t i = 0; i < objectState.size(); i++)
 	{
@@ -585,17 +599,21 @@ int OSIReporter::UpdateOSIMovingObject(ObjectState* objectState)
 	obj_osi_internal.mobj->mutable_base()->mutable_orientation()->set_pitch(objectState->state_.pos.GetP());
 	obj_osi_internal.mobj->mutable_base()->mutable_orientation()->set_yaw(objectState->state_.pos.GetH());
 	obj_osi_internal.mobj->mutable_base()->mutable_orientation_rate()->set_yaw(objectState->state_.pos.GetHRate());
+	obj_osi_internal.mobj->mutable_base()->mutable_orientation_rate()->set_pitch(objectState->state_.pos.GetPRate());
+	obj_osi_internal.mobj->mutable_base()->mutable_orientation_rate()->set_roll(objectState->state_.pos.GetRRate());
 	obj_osi_internal.mobj->mutable_base()->mutable_orientation_acceleration()->set_yaw(objectState->state_.pos.GetHAcc());
+	obj_osi_internal.mobj->mutable_base()->mutable_orientation_acceleration()->set_pitch(objectState->state_.pos.GetPAcc());
+	obj_osi_internal.mobj->mutable_base()->mutable_orientation_acceleration()->set_roll(objectState->state_.pos.GetRAcc());
 
 	// Set OSI Moving Object Velocity
 	obj_osi_internal.mobj->mutable_base()->mutable_velocity()->set_x(objectState->state_.pos.GetVelX());
 	obj_osi_internal.mobj->mutable_base()->mutable_velocity()->set_y(objectState->state_.pos.GetVelY());
-	obj_osi_internal.mobj->mutable_base()->mutable_velocity()->set_z(0);  // assume neglectable speed in z dimension
+	obj_osi_internal.mobj->mutable_base()->mutable_velocity()->set_z(objectState->state_.pos.GetVelZ());
 
 	// Set OSI Moving Object Acceleration
 	obj_osi_internal.mobj->mutable_base()->mutable_acceleration()->set_x(objectState->state_.pos.GetAccX());
 	obj_osi_internal.mobj->mutable_base()->mutable_acceleration()->set_y(objectState->state_.pos.GetAccY());
-	obj_osi_internal.mobj->mutable_base()->mutable_acceleration()->set_z(0);  // assume neglectable speed in z dimension
+	obj_osi_internal.mobj->mutable_base()->mutable_acceleration()->set_z(objectState->state_.pos.GetAccZ());
 
 	// Set OSI Moving Object Lane ID
 	obj_osi_internal.mobj->add_assigned_lane_id()->set_value(objectState->state_.pos.GetLaneGlobalId());
@@ -1645,3 +1663,11 @@ const char* OSIReporter::GetOSISensorDataRaw()
 {
     return (const char*) obj_osi_internal.sd;
 }
+
+int OSIReporter::SetOSITimeStampExplicit(unsigned long long int nanoseconds)
+{
+	nanosec_ = nanoseconds;
+
+	return 0;
+}
+

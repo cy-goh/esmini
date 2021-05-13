@@ -83,7 +83,7 @@ namespace scenarioengine
 
 	private:
 
-		friend class ScemarioGateway;
+		friend class ScenarioGateway;
 	};
 
 
@@ -111,6 +111,11 @@ namespace scenarioengine
 		void reportObject(int id, std::string name, int obj_type, int obj_category, int model_id, int ctrl_type, OSCBoundingBox boundingbox,
 			double timestamp, double speed, double wheel_angle, double wheel_rot,
 			int roadId, double lateralOffset, double s);
+
+		void reportObjectVel(int id, double x_vel, double y_vel, double z_vel);
+		void reportObjectAcc(int id, double x_acc, double y_acc, double z_acc);
+		void reportObjectAngularVel(int id, double h_rate, double p_rate, double r_rate);
+		void reportObjectAngularAcc(int id, double h_acc, double p_acc, double r_acc);
 
 		void removeObject(int id);
 		void removeObject(std::string name);

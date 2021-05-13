@@ -745,6 +745,17 @@ extern "C"
 	*/
 	SE_DLL_API bool SE_OSIFileWrite(bool flush = false);
 
+	/**
+		Set explicit OSI timestap
+		Note that this timestamp does NOT affect esmini simulation time
+		Also note that setting timestamp with this function will move into explicit time mode
+		and from that point OSI timestamp is exclusively controlled by this function.
+		@param nanoseconds Nano seconds (1e-9 s) 
+		@return 0 if successful, -1 if not
+	*/
+	SE_DLL_API int SE_OSISetTimeStamp(unsigned long long int nanoseconds);
+
+
 	SE_DLL_API void SE_LogMessage(char *message);
 
 	// Viewer settings
@@ -791,9 +802,15 @@ extern "C"
 
 	/**
 		Set maximum vehicle speed.
-		@param speed Maximum speed (m/s)
+		@param speed Maximum speed (km/h)
 	*/
 	SE_DLL_API void SE_SimpleVehicleSetMaxSpeed(void *handleSimpleVehicle, float speed);
+
+	/**
+		Set acceleration scale factor
+		@param accScale Acceleration scale factor speed (0:10)
+	*/
+	SE_DLL_API void SE_SimpleVehicleSetAcclerationScale(void* handleSimpleVehicle, float accScale);
 
 	/**
 		Get current state of the vehicle. Typically called after Control has been applied.

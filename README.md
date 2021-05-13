@@ -25,7 +25,9 @@ Repository: <https://github.com/esmini/esmini>
 
 Pre-built demo packages are available [here](https://github.com/esmini/esmini/releases/latest). Unzip, navigate to "esmini\run\esmini" and run any of the example scripts. See more info below under "Binaries and demos".
 
-**Please note**: From version 1.5 esmini only supports OpenSCENARIO v1.0. All demo scenarios has been updated from 0.9.1 to 1.0. ASAM provides a transformation scheme (migration0_9_1to1_0.xslt, part of the OpenSCENARIO 1.0 release bundle) that can be used with tools for automatic migration of XML files.
+esmini supports OpenSCENARIO v1.1 (from esmini v2.7) and v1.0 (from esmini v1.5). In order to run older versions (i.e. v0.9.1) ASAM provides a transformation scheme (migration0_9_1to1_0.xslt, part of the OpenSCENARIO release bundle) that can be used with tools for automatic migration of XML files.
+
+Please note that the OpenSCENARIO [coverage](https://github.com/esmini/esmini/blob/master/osc_coverage.txt) is limited, which means that not all features of OpenSCENARIO are supported. The functionalty grows slow but steady, based on need and contributions.
 
 The code was initially a result from the Swedish collaborative research project [Simulation Scenarios](https://sites.google.com/view/simulationscenarios), and is now further developed based on users need and OpenSCENARIO development.
 
@@ -37,7 +39,8 @@ The purpose of this implementation was to explore and get familiar with the emer
 
 Although allowed by the license this implementation is not primarily intended for production use. The code was developed ad hoc to answer research questions connected with the ongoing project. Therefore, code quality, as expected from standard production applications, is lacking when it comes to clarity, structure, comments, error handling and coding guidelines.
 
-[OpenSCENARIO coverage](./osc_coverage.txt) is limited as it was developed on demand and defined by the research scope. Moreover, since the Simulation Scenarios project is closed, no formal support should be expected from the initial contributors.  
+Since the Simulation Scenarios project is closed, no formal support should be expected from the initial contributors.  
+
 Nevertheless, regarding the above stated limitations, it was decided to release the code as is, as a public outcome from the project. It can hopefully serve as guidance or just inspiration for those aspiring to build similar tools, or even get accustomed with the OpenSCENARIO format. And of course, all contributions to further development are welcome!
 
 ## Binaries and demos
@@ -61,13 +64,37 @@ If you get the "damaged file" message, please open a terminal in the folder wher
 If you want to build yourself, please find some instructions [here](https://github.com/esmini/esmini/blob/master/docs/BuildInstructions.md).
 
 ## Run esmini
-Either get the demo or build yourself. To run demos:
+Either get the demo or build yourself. To run demo scenarios:
 1. Navigate to run/esmini
 2. Run any of the provided batch-script examples (double click on or run from command line)
 
+Or launch esmini from command prompt. There are many options but a few typical examples, assuming current directory is esmini root folder:  
+
+* Just run a scenario:  
+```./bin/esmini --window 60 60 800 400 --osc ./resources/xosc/cut-in.xosc```
+
+* Execute and record a scenario with fixed timesteps and no viewer:  
+```./bin/esmini --headless --fixed_timestep 0.01 --record sim.dat --osc ./resources/xosc/cut-in.xosc```
+
+* Replay a recorded scenario:  
+```./bin/replayer --window 60 60 800 400 --res_path ./resources --file sim.dat```
+
 Further info:
-* [Launch commands](https://github.com/esmini/esmini/blob/master/docs/commands.txt)
-* [Runtime control](https://github.com/esmini/esmini/blob/master/docs/readme.txt)
+* [esmini launch commands](https://github.com/esmini/esmini/blob/master/docs/commands.txt)
+* [esmini runtime control](https://github.com/esmini/esmini/blob/master/docs/readme.txt)
+* [replayer launch and key shortcut commands](https://github.com/esmini/esmini/blob/master/EnvironmentSimulator/Applications/replayer/readme.txt)
+
+## Run ASAM OpenSCENARIO examples
+
+With some limitations (see details [here](https://github.com/esmini/esmini/blob/master/osc_coverage.txt)) esmini can play the example scenarios provided with the ASAM OpenSCENARIO v1.1 release bundle.
+* If you don't have esmini already, download latest demo package for your platform from [here](https://github.com/esmini/esmini/releases/latest).
+* Download the standard from ASAM [here](https://www.asam.net/standards/detail/openscenario/) (register and download is free of charge).
+* Extract to any folder.
+* Run the examples from command line in esmini root folder, for example:  
+```./bin/esmini --window 60 60 800 400 --osc ../../openscenario-v1.1.0/Examples/DoubleLaneChanger.xosc```  
+  or with absolute path:  
+```./bin/esmini --window 60 60 800 400 --osc c:/stuff/openscenario-v1.1.0/Examples/DoubleLaneChanger.xosc```
+
 
 ## esmini shared library
 The easiest way of integrating esmini in your custom application is to link the all inclusive shared library ScenarioEngineDLL. In spite of the name it's available also on Linux and Mac.
@@ -115,7 +142,14 @@ esmini comes with a few controllers (ways of controlling individual entities in 
 - SumoController. A way of integrating SUMO controlled vehicles in a scenario.
 
 More information [here](https://github.com/esmini/esmini/blob/master/docs/Controllers.md).
- 
+
+## 3D model support
+
+esmini make use of OpenSceneGraph (OSG) for visualization of the scenario. The OpenSCENARIO files can optionally refer to existing 3D models of the static environment (scene graph) and dynamic objects (entites). If the scene graph reference is missing, esmini will try to generate a basic model based on the OpenDRIVE road network description.
+
+Currently esmini only supports OSG native .osgb 3D file format. However, there are ways to convert 3D models of some other formats using the OSG tool osgconv. Please see [this issue report](https://github.com/esmini/esmini/issues/63#issuecomment-742273326) for some more info.
+
+
 ## Related work
 ### pyoscx
 [pyoscx](https://github.com/pyoscx/pyoscx) is a Python based scenario creation framework. The idea is to write scenarios in a high-level script format and automatically generate the OpenSCENARIO 1.0 XML counterpart.

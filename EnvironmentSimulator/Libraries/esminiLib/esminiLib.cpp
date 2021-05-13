@@ -868,6 +868,8 @@ extern "C"
 		{
 			if (id >= 0 && id < player->scenarioEngine->entities.object_.size())
 			{
+				player->scenarioGateway->reportObjectVel(id, x_vel, y_vel, z_vel);
+				// Also update accelerations directly in scenario object, in case we're in a callback
 				player->scenarioEngine->entities.object_[id]->SetVel(x_vel, y_vel, z_vel);
 			}
 			else
@@ -885,6 +887,8 @@ extern "C"
 		{
 			if (id >= 0 && id < player->scenarioEngine->entities.object_.size())
 			{
+				player->scenarioGateway->reportObjectAngularVel(id, h_rate, p_rate, r_rate);
+				// Also update accelerations directly in scenario object, in case we're in a callback
 				player->scenarioEngine->entities.object_[id]->SetAngularVel(h_rate, p_rate, r_rate);
 			}
 			else
@@ -902,6 +906,8 @@ extern "C"
 		{
 			if (id >= 0 && id < player->scenarioEngine->entities.object_.size())
 			{
+				player->scenarioGateway->reportObjectAcc(id, x_acc, y_acc, z_acc);
+				// Also update accelerations directly in scenario object, in case we're in a callback
 				player->scenarioEngine->entities.object_[id]->SetAcc(x_acc, y_acc, z_acc);
 			}
 			else
@@ -919,6 +925,8 @@ extern "C"
 		{
 			if (id >= 0 && id < player->scenarioEngine->entities.object_.size())
 			{
+				player->scenarioGateway->reportObjectAngularAcc(id, h_acc, p_acc, r_acc);
+				// Also update accelerations directly in scenario object, in case we're in a callback
 				player->scenarioEngine->entities.object_[id]->SetAngularAcc(h_acc, p_acc, r_acc);
 			}
 			else
@@ -1121,6 +1129,17 @@ extern "C"
 		}
 
 		return retval;
+	}
+
+	SE_DLL_API int SE_OSISetTimeStamp(unsigned long long int nanoseconds)
+	{
+		if (player)
+		{
+			player->osiReporter->SetOSITimeStampExplicit(nanoseconds);
+			return 0;
+		}
+
+		return -1;
 	}
 
 	SE_DLL_API void SE_LogMessage(char *message)
@@ -1434,7 +1453,16 @@ extern "C"
 		{
 			return;
 		}
-		((vehicle::Vehicle *)handleSimpleVehicle)->SetMaxSpeed(speed);
+		((vehicle::Vehicle *)handleSimpleVehicle)->SetMaxSpeed(speed/3.6);
+	}
+
+	SE_DLL_API void SE_SimpleVehicleSetAcclerationScale(void* handleSimpleVehicle, float accScale)
+	{
+		if (handleSimpleVehicle == 0)
+		{
+			return;
+		}
+		((vehicle::Vehicle*)handleSimpleVehicle)->SetAccelerationScale(accScale);
 	}
 
 	SE_DLL_API void SE_SimpleVehicleGetState(void *handleSimpleVehicle, SE_SimpleVehicleState *state)

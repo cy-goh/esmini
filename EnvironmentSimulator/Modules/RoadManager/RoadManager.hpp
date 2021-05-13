@@ -869,11 +869,17 @@ namespace roadmanager
 		}
 
 		std::string GetName() { return name_; }
+		std::string GetType() { return type_; }
+		int GetId() { return id_; }
 		double GetS() { return s_; }
 		double GetT() { return t_; }
 		double GetHOffset() { return heading_; }
+		double GetPitch() { return pitch_; }
+		double GetRoll() { return roll_; }
 		double GetZOffset() { return z_offset_; }
 		double GetHeight() { return height_; }
+		double GetLength() { return length_; }
+		double GetWidth() { return width_; }
 		Orientation GetOrientation() { return orientation_; }
 		void AddOutline(Outline* outline) { outlines_.push_back(outline); }
 		int GetNumberOfOutlines() { return (int)outlines_.size(); }
@@ -982,6 +988,7 @@ namespace roadmanager
 		int GetNumberOfLanes(double s);
 		int GetNumberOfDrivingLanes(double s);
 		Lane* GetDrivingLaneByIdx(double s, int idx);
+		Lane* GetDrivingLaneSideByIdx(double s, int side, int idx);
 		Lane* GetDrivingLaneById(double s, int idx);
 		int GetNumberOfDrivingLanesSide(double s, int side);  // side = -1 right, 1 left
 
@@ -1383,8 +1390,8 @@ namespace roadmanager
 
 		void ReleaseRelation();
 
-		void SetRoute(Route *route);
-		void CalcRoutePosition();
+		int SetRoute(Route *route);
+		int CalcRoutePosition();
 		const roadmanager::Route* GetRoute() const { return route_; }
 		Route* GetRoute() { return route_; }
 		RMTrajectory* GetTrajectory() { return trajectory_; }
@@ -1402,7 +1409,7 @@ namespace roadmanager
 		Retrieve the S-value of the current route position. Note: This is the S along the
 		complete route, not the actual individual roads.
 		*/
-		double GetRouteS() { return s_; }
+		double GetRouteS() { return s_route_; }
 
 		/**
 		Move current position forward, or backwards, ds meters along the route
@@ -1951,8 +1958,7 @@ namespace roadmanager
 		int GetNumberOfVertices() { return (int)vertex_.size(); }
 		TrajVertex* GetVertex(int index);
 		void Reset();
-		int S2P(double s, double& p, double& h, double& z);
-		int P2S(double p, double& s, double& h, double& z);
+		int Time2S(double time, double& s);
 
 		std::vector<TrajVertex> vertex_;
 		TrajVertex currentPos_;
@@ -2056,6 +2062,8 @@ namespace roadmanager
 		std::vector<ControlPoint> ctrlPoint_;
 		std::vector<double> knot_;
 		std::vector<double> d_;  // used for temporary storage of CoxDeBoor weigthed control points
+		std::vector<double> dPeakT_;  // used for storage of at what t value the corresponding ctrlPoint contribution peaks
+		std::vector<double> dPeakValue_;  // used for storage of at what t value the corresponding ctrlPoint contribution peaks
 
 		void CalculatePolyLine();
 		double GetLength() { return length_; }
@@ -2077,6 +2085,7 @@ namespace roadmanager
 		void Freeze();
 		double GetLength() { return shape_ ? shape_->GetLength() : 0.0; }
 		double GetTimeAtS(double s);
+		double GetDuration();
 
 		std::string name_;
 		bool closed_;

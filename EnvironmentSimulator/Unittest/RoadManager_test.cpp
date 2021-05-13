@@ -1677,6 +1677,71 @@ TEST(DistanceTest, CalcDistanceLong)
     EXPECT_NEAR(dist, 9.486871, 1e-5);
 }
 
+TEST(TestNurbsPosition, NurbsTest)
+{
+    NurbsShape n(4);
+
+    n.AddControlPoint(Position(-4.0, -4.0, 0.0, 0.0, 0.0, 0.0), 0.0, 1.0, true);
+    n.AddControlPoint(Position(-2.0, 4.0, 0.0, 0.0, 0.0, 0.0), 0.0, 1.0, true);
+    n.AddControlPoint(Position(2.0, -4.0, 0.0, 0.0, 0.0, 0.0), 0.0, 1.0, true);
+    n.AddControlPoint(Position(4.0, 4.0, 0.0, 0.0, 0.0, 0.0), 0.0, 1.0, true);
+
+    std::vector<double> knots = { 0, 0, 0, 0, 1, 1, 1, 1 };
+    n.AddKnots(knots);
+    n.CalculatePolyLine();
+
+    TrajVertex v;
+
+    n.Evaluate(0, Shape::TrajectoryParamType::TRAJ_PARAM_TYPE_S, v);
+    EXPECT_DOUBLE_EQ(v.x, -4.0);
+    EXPECT_DOUBLE_EQ(v.y, -4.0);
+
+    n.Evaluate(0.5 * n.GetLength(), Shape::TrajectoryParamType::TRAJ_PARAM_TYPE_S, v);
+    EXPECT_NEAR(v.x, 0.0, 1e-5);
+    EXPECT_NEAR(v.y, 0.0, 1e-5);
+
+    n.Evaluate(1.0 * n.GetLength(), Shape::TrajectoryParamType::TRAJ_PARAM_TYPE_S, v);
+    EXPECT_NEAR(v.x, 4.0, 1e-5);
+    EXPECT_NEAR(v.y, 4.0, 1e-5);
+
+    n.Evaluate(0.40045 * n.GetLength(), Shape::TrajectoryParamType::TRAJ_PARAM_TYPE_S, v);
+    EXPECT_NEAR(v.x, -1.248623, 1e-5);
+    EXPECT_NEAR(v.y, -0.087722, 1e-5);
+    EXPECT_NEAR(v.p, 0.360046, 1e-5);
+}
+
+TEST(TestAssignRoute, Route)
+{
+    Position::GetOpenDrive()->LoadOpenDriveFile("../../../resources/xodr/fabriksgatan.xodr");
+    OpenDrive* odr = Position::GetOpenDrive();
+    ASSERT_NE(odr, nullptr);
+    EXPECT_EQ(odr->GetNumOfRoads(), 16);
+
+    const int nrWaypoints = 3;
+    Route route;
+    Position routepos[nrWaypoints];
+    routepos[0].SetLanePos(0, 1, 10.0, 0);
+    routepos[1].SetLanePos(8, -1, 2.0, 0);
+    routepos[2].SetLanePos(1, -1, 2.0, 0);
+    for (int i = 0; i < nrWaypoints; i++)
+    {
+        route.AddWaypoint(&routepos[i]);
+    }
+
+    Position pos0 = Position(0, 1, 9.0, 0.5);
+    pos0.SetRoute(&route);
+    EXPECT_DOUBLE_EQ(pos0.GetRouteS(), 1.0);
+
+    // Set a position in intersection, near route 
+    pos0.SetLanePos(8, -1, 1.5, -0.5);
+    EXPECT_EQ(pos0.SetRoute(&route), 0);
+    EXPECT_DOUBLE_EQ(pos0.GetRouteS(), 11.5);
+
+    // Set a position in intersection, at a lane not part of the route 
+    pos0.SetLanePos(16, -1, 1.0, 0.0);
+    EXPECT_EQ(pos0.SetRoute(&route), -1);  // pos not along the route
+}
+
 int main(int argc, char **argv)
 {
     testing::InitGoogleTest(&argc, argv);

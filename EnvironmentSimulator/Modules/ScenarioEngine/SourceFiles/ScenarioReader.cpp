@@ -17,6 +17,7 @@
 #include "ControllerFollowGhost.hpp"
 #include "ControllerSumo.hpp"
 #include "ControllerExternal.hpp"
+#include "ControllerRel2Abs.hpp"
 
 #include <cstdlib>
 
@@ -45,6 +46,7 @@ void ScenarioReader::LoadControllers()
 	RegisterController(ControllerFollowGhost::GetTypeNameStatic(), InstantiateControllerFollowGhost);
 	RegisterController(ControllerSumo::GetTypeNameStatic(), InstantiateControllerSumo);
 	RegisterController(ControllerExternal::GetTypeNameStatic(), InstantiateControllerExternal);
+	RegisterController(ControllerRel2Abs::GetTypeNameStatic(), InstantiateControllerRel2Abs);
 }
 
 void ScenarioReader::UnloadControllers()
@@ -1093,13 +1095,42 @@ OSCPosition *ScenarioReader::parseOSCPosition(pugi::xml_node positionNode)
 
 	if (positionChildName == "WorldPosition")
 	{
+		double x = std::nan("");
+		double y = std::nan("");
+		double z = std::nan("");
+		double h = std::nan("");
+		double p = std::nan("");
+		double r = std::nan("");
 
-		double x = strtod(parameters.ReadAttribute(positionChild, "x", true));
-		double y = strtod(parameters.ReadAttribute(positionChild, "y", true));
-		double z = strtod(parameters.ReadAttribute(positionChild, "z", false));
-		double h = strtod(parameters.ReadAttribute(positionChild, "h", false));
-		double p = strtod(parameters.ReadAttribute(positionChild, "p", false));
-		double r = strtod(parameters.ReadAttribute(positionChild, "r", false));
+		if (positionChild.attribute("x"))
+		{
+			x = strtod(parameters.ReadAttribute(positionChild, "x", true));
+		}
+		if (positionChild.attribute("y"))
+		{
+			y = strtod(parameters.ReadAttribute(positionChild, "y", true));
+		}
+		if (!positionChild.attribute("z").empty())
+		{
+			z = strtod(parameters.ReadAttribute(positionChild, "z", true));
+		}
+		if (!positionChild.attribute("h").empty())
+		{
+			h = strtod(parameters.ReadAttribute(positionChild, "h", true));
+		}
+		if (!positionChild.attribute("p").empty())
+		{
+			p = strtod(parameters.ReadAttribute(positionChild, "p", true));
+		}
+		if (!positionChild.attribute("r").empty())
+		{
+			r = strtod(parameters.ReadAttribute(positionChild, "r", true));
+		}
+
+		if (isnan(x) || isnan(y))
+		{
+			LOG_AND_QUIT("Missing x or y attributes!\n");
+		}
 
 		OSCPositionWorld *pos = new OSCPositionWorld(x, y, z, h, p, r);
 
@@ -2105,32 +2136,32 @@ OSCPrivateAction *ScenarioReader::parseOSCPrivateAction(pugi::xml_node actionNod
 						// read active flag
 						overrideStatus.active = parameters.ReadAttribute(controllerDefNode, "active") == "true" ? true : false;
 
-						if (controllerDefNode.name() == std::string("OverrideThrottleAction"))
+						if (controllerDefNode.name() == std::string("Throttle"))
 						{
 							overrideStatus.type = Object::OverrideType::OVERRIDE_THROTTLE;
 							overrideStatus.value = override_action->RangeCheckAndErrorLog(overrideStatus.type, value);
 						}
-						else if (controllerDefNode.name() == std::string("OverrideBrakeAction"))
+						else if (controllerDefNode.name() == std::string("Brake"))
 						{
 							overrideStatus.type = Object::OverrideType::OVERRIDE_BRAKE;
 							overrideStatus.value = override_action->RangeCheckAndErrorLog(overrideStatus.type, value);
 						}
-						else if (controllerDefNode.name() == std::string("OverrideClutchAction"))
+						else if (controllerDefNode.name() == std::string("Clutch"))
 						{
 							overrideStatus.type = Object::OverrideType::OVERRIDE_CLUTCH;
 							overrideStatus.value = override_action->RangeCheckAndErrorLog(overrideStatus.type, value);
 						}
-						else if (controllerDefNode.name() == std::string("OverrideParkingBrakeAction"))
+						else if (controllerDefNode.name() == std::string("ParkingBrake"))
 						{
 							overrideStatus.type = Object::OverrideType::OVERRIDE_PARKING_BRAKE;
 							overrideStatus.value = override_action->RangeCheckAndErrorLog(overrideStatus.type, value);
 						}
-						else if (controllerDefNode.name() == std::string("OverrideSteeringWheelAction"))
+						else if (controllerDefNode.name() == std::string("SteeringWheel"))
 						{
 							overrideStatus.type = Object::OverrideType::OVERRIDE_STEERING_WHEEL;
 							overrideStatus.value = override_action->RangeCheckAndErrorLog(overrideStatus.type, value, -2 * M_PI, 2 * M_PI);
 						}
-						else if (controllerDefNode.name() == std::string("OverrideGearAction"))
+						else if (controllerDefNode.name() == std::string("Gear"))
 						{
 							overrideStatus.type = Object::OverrideType::OVERRIDE_GEAR;
 							overrideStatus.value = override_action->RangeCheckAndErrorLog(overrideStatus.type, value, -1, 8, true);

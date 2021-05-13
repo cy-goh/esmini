@@ -1,5 +1,43 @@
 ## esmini release notes
 
+### 2021-05-07 Version 2.8.1
+
+- Add some accessors to RMObject, e.g. GetType(), GetLength()... (issue #109)
+- Increase precision in csv files (created by dat2csv and dat2csv.py)
+- Bugfixes:
+  - Fix LaneChange issue over end-to-end/start-to-start road succession (PR #110)
+  - Update filename container size in dat2csv.py
+  - Fix wrong nurbs trajectory time interpolation
+  - Improve action timings (push interpolations one time step)
+  - Fix SE_ReportObject\* functions, prevent values getting overwritten
+- Some additional minor fixes
+
+### 2021-04-29 Version 2.8.0
+
+- New feature in odrplot: Indicate road ID and direction
+- odrviewer update: Respawn vehicles at open road ends (if any)
+- Bugfix: Remove 0.5m trajectory end tolerance causing wrong end position
+- Add [API](https://github.com/esmini/esmini/blob/f8a0cd739528a1811ab2d595ff47709bdc077377/EnvironmentSimulator/Libraries/esminiLib/esminiLib.hpp#L803) for simple vehicle performance
+- Improve replayer file path handling for odr and osgb
+  - Expand filename container and store complete file paths in .dat file   
+  NOTE: This change affects .dat file format - old recordings files will not play
+  - If absolute path not found, test combinations using res_path argument
+- Added mandatory field maxAcceleration to the vehicle catalog
+
+### 2021-04-26 Version 2.7.4
+
+- Add [func](https://github.com/esmini/esmini/blob/1340dad935c52ad955963a484e5d12b3f431a40a/EnvironmentSimulator/Libraries/esminiLib/esminiLib.hpp#L748) to set explicit OSI timestamp
+- Fix issues in OverrideControllerValueAction
+  - Correct wrong override action element name
+  - Quit action immediately (as clarified in OSC v1.1 User Guide)
+- Improve scroll wheel handling (issue [#105](https://github.com/esmini/esmini/issues/105))
+  - inverse wheel in OSG default camera models
+  - add scroll wheel zoom to esmini camera models
+- Add ideal-sensors [code example](https://github.com/esmini/esmini/blob/master/EnvironmentSimulator/code-examples/ideal-sensors/ideal-sensors.cpp)
+- Fix odrplot step-length bug (issue [#100](https://github.com/esmini/esmini/issues/100))
+- Add brief info on 3D model conversion to [readme](https://github.com/esmini/esmini#3d-model-support) (issue [#63](https://github.com/esmini/esmini/issues/63))
+- Some additional minor fixes
+
 ### 2021-04-16 Version 2.7.3
 
 - API to get object properties

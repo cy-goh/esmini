@@ -3,7 +3,7 @@ import ctypes
 import os
 
 
-REPLAY_FILENAME_SIZE = 128
+REPLAY_FILENAME_SIZE = 512
 NAME_LEN = 32
 
 
@@ -84,7 +84,7 @@ def dat2csv(datfile):
             break
 
         data = ObjectStateStructDat.from_buffer_copy(buffer)
-        fcsv.write('{:.3f}, {}, {}, {:.2f}, {:.2f}, {:.2f}, {:.2f}, {:.2f}, {:.2f}, {:.2f}, {:.2f}, {:.2f}\n'.format(
+        fcsv.write('{:.3f}, {}, {}, {:.3f}, {:.3f}, {:.3f}, {:.3f}, {:.3f}, {:.3f}, {:.3f}, {:.3f}, {:.3f}\n'.format(
             data.timestamp,
             data.id,
             data.name.decode('utf-8'),
