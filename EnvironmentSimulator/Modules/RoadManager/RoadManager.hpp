@@ -881,6 +881,8 @@ namespace roadmanager
 		double GetLength() { return length_; }
 		double GetWidth() { return width_; }
 		Orientation GetOrientation() { return orientation_; }
+		void AddCoordinate(std::array<double, 4> coordinate) { coordinates_.push_back(coordinate); }
+		std::vector<std::array<double, 4>> GetCoordinate() { return coordinates_; }
 		void AddOutline(Outline* outline) { outlines_.push_back(outline); }
 		int GetNumberOfOutlines() { return (int)outlines_.size(); }
 		Outline* GetOutline(int i) { return (0 <= i && i < outlines_.size()) ? outlines_[i] : 0; }
@@ -900,6 +902,7 @@ namespace roadmanager
 		double pitch_;
 		double roll_;
 		std::vector<Outline*> outlines_;
+		std::vector<std::array<double, 4>> coordinates_;
 	};
 
 	class Road

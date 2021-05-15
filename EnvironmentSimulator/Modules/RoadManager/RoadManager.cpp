@@ -3041,6 +3041,22 @@ bool OpenDrive::LoadOpenDriveFile(const char *filename, bool replace)
 						obj->AddOutline(outline);
 					}
 				}
+
+				pugi::xml_node coordinates_node = object.child("coordinates");
+				if (coordinates_node != NULL)
+				{
+					for (pugi::xml_node coordinate_node = coordinates_node.child("coordinate"); coordinate_node; coordinate_node = coordinate_node.next_sibling())
+					{
+
+						double x = atof(coordinate_node.attribute("x").value());
+						double y = atof(coordinate_node.attribute("y").value());
+						double z = atof(coordinate_node.attribute("z").value());
+						double radius = atof(coordinate_node.attribute("radius").value());
+						
+						std::array<double, 4> coordinate_array { {x, y, z, radius} };
+						obj->AddCoordinate(coordinate_array);
+					}
+				}
 			}
 		}
 

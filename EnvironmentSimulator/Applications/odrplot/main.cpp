@@ -24,7 +24,7 @@
 #include "RoadManager.hpp"
 #include "CommonMini.hpp"
 #include <sstream>
-
+#include <iomanip> 
 using namespace roadmanager;
 
 std::string enum2string(roadmanager::LaneRoadMark::RoadMarkType rm){
@@ -159,6 +159,34 @@ int main(int argc, char *argv[])
 			}
 		}
 	}
+
+	for (int r = 0; r < od->GetNumOfRoads(); r++)
+	{
+		roadmanager::Road* road = od->GetRoadByIdx(r);
+
+		for (size_t o = 0; o < road->GetNumberOfObjects(); o++)
+		{
+			roadmanager::RMObject* object = road->GetObject(o);
+			std::cout << "GetType() " << object->GetType() << std::endl;
+			//std::cout << "GetOrientation() " << object->GetOrientation() << std::endl;
+			
+			roadmanager::Position pos;
+			pos.SetTrackPos(road->GetId(), object->GetS(), object->GetT());
+			
+			std::vector<std::array<double, 4>> coordinate_vec =  object->GetCoordinate();
+			if(object->GetType()=="stopline")
+			{
+				for(std::array<double, 4> coordinate_array : coordinate_vec) {
+					std::cout << "x " << coordinate_array[0] << " y " << coordinate_array[1] << " z "<< coordinate_array[2] << std::endl;
+					file << std::setprecision(8) << coordinate_array[0] << ", " << std::setprecision(8) << coordinate_array[1] << ", " << std::setprecision(8) << coordinate_array[2] << std::endl;
+				}
+				//file << std::setprecision(8) << pos.GetX() << ", " << std::setprecision(8) << pos.GetY() << ", " << std::setprecision(8) << pos.GetZ() << std::endl;
+				
+			}
+			
+		}
+	}
+
 	file.close();
 
 	delete pos;
@@ -168,3 +196,4 @@ int main(int argc, char *argv[])
 
 	return 0;
 }
+
