@@ -167,25 +167,45 @@ int main(int argc, char *argv[])
 		for (size_t o = 0; o < road->GetNumberOfObjects(); o++)
 		{
 			roadmanager::RMObject* object = road->GetObject(o);
-			std::cout << "GetType() " << object->GetType() << std::endl;
-			//std::cout << "GetOrientation() " << object->GetOrientation() << std::endl;
+			//std::cout << "GetType() " << object->GetType() << std::endl;
 			
 			roadmanager::Position pos;
 			pos.SetTrackPos(road->GetId(), object->GetS(), object->GetT());
 			
+			//file << std::setprecision(8) << pos.GetX() << ", " << std::setprecision(8) << pos.GetY() << ", " << std::setprecision(8) << pos.GetZ() << std::endl;
+			
 			std::vector<std::array<double, 4>> coordinate_vec =  object->GetCoordinate();
 			if(object->GetType()=="stopline")
 			{
-				for(std::array<double, 4> coordinate_array : coordinate_vec) {
-					std::cout << "x " << coordinate_array[0] << " y " << coordinate_array[1] << " z "<< coordinate_array[2] << std::endl;
-					file << std::setprecision(8) << coordinate_array[0] << ", " << std::setprecision(8) << coordinate_array[1] << ", " << std::setprecision(8) << coordinate_array[2] << std::endl;
-				}
-				//file << std::setprecision(8) << pos.GetX() << ", " << std::setprecision(8) << pos.GetY() << ", " << std::setprecision(8) << pos.GetZ() << std::endl;
+				file << "stopline, " << road->GetId() << ", " << o << ", " << object->GetId() << std::endl;
 				
+				for(std::array<double, 4> coordinate_array : coordinate_vec) {
+					//std::cout << "x " << coordinate_array[0] << " y " << coordinate_array[1] << " z "<< coordinate_array[2] << std::endl;
+					file << std::setprecision(8) << coordinate_array[0] << ", " << std::setprecision(8) << coordinate_array[1] << ", " << std::setprecision(8) << coordinate_array[2] << ", 25" << std::endl;
+				}
 			}
 			
+			if(object->GetType()=="zebracrossing")
+			{
+				file << "zebracrossing, " << road->GetId() << ", " << o << ", " << object->GetId() << std::endl;
+				for(std::array<double, 4> coordinate_array : coordinate_vec) {
+					//std::cout << "x " << coordinate_array[0] << " y " << coordinate_array[1] << " z "<< coordinate_array[2] << std::endl;
+					file << std::setprecision(8) << coordinate_array[0] << ", " << std::setprecision(8) << coordinate_array[1] << ", " << std::setprecision(8) << coordinate_array[2] << ", 50"  << std::endl;
+				}
+			}
+
+			if(object->GetType()=="sign")
+			{
+				file << "sign, " << road->GetId() << ", " << o << ", " << object->GetId() << std::endl;	
+				for(std::array<double, 4> coordinate_array : coordinate_vec) {
+					//std::cout << "Sign x " << coordinate_array[0] << " y " << coordinate_array[1] << " z "<< coordinate_array[2] << std::endl;
+					file << std::setprecision(8) << coordinate_array[0] << ", " << std::setprecision(8) << coordinate_array[1] << ", " << std::setprecision(8) << coordinate_array[2] << ", 50"  << std::endl;
+				}
+			}
+
 		}
 	}
+
 
 	file.close();
 
